@@ -48,9 +48,7 @@ Here's a table in Markdown format based on the information you provided:
 
 3. Installations of pfSense
    Per the topology above, the pfsesne will have 6 interfaces which is idicate below.
-   The configuration is 
-   
-
+   The configuration is.
 
 | Network Adapter   | VMNet   |
 |-------------------|---------|
@@ -63,16 +61,14 @@ Here's a table in Markdown format based on the information you provided:
 
 ![VnetConfiguration of pfsense](files/images/002pfSenseVmNetConfiguration.png)
 
-During the installation process, the first interface to show up in order to configure the rest of the interfaces indicated no IP address configuration for WAN (wan) with interface em0 . 
-Further research on my side showed that the WMware NAT servies running ont he host was stoped hence the insatance was not getting the WAN interface IP address which is the IP 
-address it will use to access the internet.  A restart of the Service in services resolves th issue. 
+During the installation process, the first interface to show up in order to configure the rest of the interfaces indicated no IP address configuration for WAN (wan) with interface em0.
+Further research on my side showed that the WMware NAT servies running ont he host was stoped hence the insatance was not getting the WAN interface IP address which is the IP.
+address it will use to access the internet.  A restart of the Service in services resolves th issue.
 In th intial IP assigment. th Wan insterface has an IP ADDRESS OF 192.1868.114.10/24  WHICH IS THE FIRST ip i CONFIGURED IN vmware fOR nat TO ASSIGNT O THE FURST INSTANCE IN THE NETWORK..The configuration can be seen below.
-
 
 ![NATSetup](files/images/005NATSetup.png)
 
 ![StoppedService](files/images/003NATServiceStopped.png)
-
 
 ![pfSenseConfiguration](files/images/004InitialIPconfigurationofPfSense.png)
 
@@ -80,12 +76,11 @@ This version aligns the content properly for a clean and readable table in Markd
 
 ### Configuration of pfSense Interfaces
 
-
-  In the image below the interfaces from WAN to em65 have been assisgned
-  ![InterfaceAssignment](files/images/006AssigningINterfaces.png)
+In the image below the interfaces from WAN to em65 have been assisgned
+![InterfaceAssignment](files/images/006AssigningINterfaces.png)
 After completing th einterface assigment, all the interfaces are now showing as indicated below:
 
-![All Interfaces Showing in pfSense](files/images/007AllInterfacesShowing.png) 
+![All Interfaces Showing in pfSense](files/images/007AllInterfacesShowing.png).
 
 The next thing to do is to set IP addresses and then set all of them. STARING WITH THE lan INTERFACES.
 In this step however, I have decided to assign each interfaces the last IP in the ranges i will be using.
@@ -100,7 +95,6 @@ The URL to access the web configurator is *http://192.168.1.254*
 |OPT2 (em3) | 192.168.3.254 | Yes | 192.168.3.10 to 192.168.3.253|
 |OPT3 (em4) | 192.168.4.254 | Yes | 192.168.4.10 to 192.168.4.253|
 |OPT4 (em5) | 192.168.5.254 | Yes | 192.168.5.10 to 192.168.5.253|
-
 
 Below is the command line interface representation of the assigned IP addresses
 ![pf Sense Interface IP assignemnts](files/images/008InterfacesSet.png)
@@ -121,10 +115,10 @@ The Table below will serve as a guide for the set up. The content of the tabke i
 
 Since the pfsense is within the LAN network which is VMNet2, I will put a work station on the same netowrk in order to access the web configurator.
 In this case i will use the windows 10 workstation installed earlier. The reserveed IP addresses for the LAN are from, 192.168.1.1 to 192.168.1.9. Since pfsense have been configured as  DHCP for the lan networkI am expectignt that the windows instance.
-will have any IP address from 192.168.1.10 to 192.168.1.253 and its Gatway will be the LAN IP confifured for the 
+will have any IP address from 192.168.1.10 to 192.168.1.253 and its Gatway will be the LAN IP confifured for the.
 pfsense which is 192.168.1.254.
 
-OPening the windows instance indicated to me the instance has been assigned an IP of 192.168.1.10 as can be confirmed from the attached 
+OPening the windows instance indicated to me the instance has been assigned an IP of 192.168.1.10 as can be confirmed from the attached.
 image below
 
 ![Windows 10 Auto Assigned IP](files/images/009WIn10AtuoAssignedIP.png)
@@ -135,12 +129,12 @@ The web configurator URL as indicated earlier can be assessed via  *http://192.1
 Entering the URL in windows opens up the web configurator as shown below:
 
 In the first web interface set up
+
 1. Hostnmae = pfsense
 2. Domain = biira.com
 3. Primary DNS: 8.8.8.8
 4. Seconday DNS : 4.4.4.4
    ![DNSSetup](files/images/011DNSPage.png)
-
 
 5. Time Server was kept as the Default. and time change to US central timezone.
 6. ALl setttings on the WAN interface was kep as default apart from the option to ```Block RFC1918 Private Networks``` and  ```Block bogon networks``` which were unchecked.
@@ -160,7 +154,6 @@ Some of the interfacenames have been changed as indicated below
 
 Here’s a table in Markdown format with the headers "Old Name" and "New Name" along with two rows of dummy data:
 
-
 | Old Name       | New Name        |
 |----------------|--------------- |
 | OPT1 (em2)     | span           |
@@ -170,47 +163,156 @@ Here’s a table in Markdown format with the headers "Old Name" and "New Name" a
 ![New Names](files/images/015NewNames.png)
 
 #### COnfiguring Span
-In the Brisges tab, I will then forward all traffic from the LAN port to the SPAN as per the configuraiton
+
+In the Bridges tab, I will then forward all traffic from the LAN port to the SPAN as per the configuraiton
 
 ![Lan to Span](files/images/016LantoSpan.png)
 ![BridgedLanTOSPan](files/images/017DoneBridge.png)
 
-
 ### Creatinf FIrewall Rules
+
 1. On the WAN network I configured traffic to be allowed with no restrictions.
 ![Wan FIrewall](files/images/018WANFirewall.png)
-
 
 2. On th LAN, the Default Firewall Rule was deleted and then created a new rule to allow all traffic.
    ![Lan Forwall Rule](files/images/019LanRUle.png)
 3. ALl other ports were confirigures the smae way to allow for communication from any port to 
 
-
 ## Installing Kali Linux
-Kali Linux has been installed and assigned to VMnet4 interface which will ensure it obtaines IP address in the 
+
+Kali Linux has been installed and assigned to VMnet4 interface which will ensure it obtaines IP address in the.
 ragne from 192.168.3.0/24 network but it starts from 192.168.3.10.
-THe Kali maachine therefore has the IP address of 192.168.3.10 as indicated below. It ill also be reacherable to the interenet through the 
+THe Kali maachine therefore has the IP address of 192.168.3.10 as indicated below. It ill also be reacherable to the interenet through the
 pfsense firewall configuration.
 ![Kali Installaion](files/images/020KaliINstallaiontandIPConfiguration.png)
 
+## Installing Metasplloitable
 
+The installation of this Vulnerable box is places on VMnet2 which is representing the Internal Netowkr or LAN. SInce the pfSense is also working as a DHCP it automatically leases out the next IP after thr one it had already leased to the Windows 10 instance which also fell in the LAN network. The IP address given to the Metasploitable Instance is 192.168.1.11 as can be seen from the Image below:
 
+![Automatic IP Assignment](files/images/022MetaspoitableObtainesIP.png)
+Mestappitable has an automatic user name of ```msfadmin``` and and correspingin password or ```msfadmin```.
+The Metaspoitable 2 GUI can therefore be accessed at http:192.168.1.11 as indicated below
+![Metaspitable2Intarface](files/images/023MetsaplitableGUI.png)
 
+This also gives me the optint o have a graphical interface access to the other components likes the Damn Vulnerable Web App (DVWA).
 
+![DVWA](files/images/024DVWA.png)
 
+## Installing Ubuntu Server
 
+Per the topology, Ubuntu server which will host the Splunk software will be installed on the 192.168.5.0/24 network whhich is configured to be on Vmnet6
+![Ubuntu Server Configuration](files/images/025UbuntuServerNetworkSetup.png)
 
+## Installation of Security Onion
 
+In the setup of Security Onion, I will be using three network adapters namely
 
+1. NAT : Used for the managment
+2. Vmnet3 : will be used as the span port and.
+3. Vmnet5 : will be used to collect the logs collection. 
 
+In the setup, ens160 has been desginated as the Managment Interface.
+![MgmtInterface](files/images/026ManagmentIntSecOnion.png)
 
+The Managemnet Interface was then assign a static IP address of 192.168.114.5 which is the IP from the vmnet8 adapter that has the NAT configuration on teh host machine
+![Host IP](files/images/027Vmnet8HostIP.png)
+![Host IP Second](files/images/028Vment8OnPC.png)
+![VM Ware Set up](files/images/029VmwareSetup.png)
 
+The Gateway IP is 192.168.114.2 as indicated below
+![Gateway IP Below](files/images/030GatewayNAT.png)
 
+IN the NAT Ocnfiguration i did as can be seen from the images above, The automatic IP assignemtn starts from  192.168.114.10 to  192.168.114.254. The static IPS are from  192.168.114.1- 192.168.114.9. However, the  192.168.114.1 has been assigned to the Hposy PV VMWare network adaptor as shown above whist the  192.168.114.2 is used as the Gateway. This therfore implies that, the available Static IP addresses available to assign are from  192.168.114.3 to  192.168.114.9.
 
+I will hoever assign the  192.168.114.5 to the SecurityOnion Management Interface.
 
+![Mgmt Interface IP Assigned](files/images/031MgntIPAssign.png)
 
+I then set the Default Gateway to 192.168.114.2 as indicated earlier in the NAT configuration and then also set the DNS to *biira.com*
+![alt text](files/images/032SecOnio.png)
 
+The URL to access the Security Onion Console (SOC) Interface is https://192.168.114.5/.
+The SOC Username as set is noble@biira.com with the password known to myself. Lol
 
+After installation, I ran the ```sudo soup``` command to ensure that my Security Onion instance was up to date with the latest security patches and software enhancements. This step is crucial for maintaining the integrity and security of the system, as it ensures that all detection tools like Zeek and Suricata are operating with the most current features and protections.
+
+Keeping Security Onion updated with sudo soup helps enhance stability, ensures compatibility with other tools, and fortifies the system against known vulnerabilities—critical aspects in any security-focused environment.
+
+---
+
+### Configuring Security Onion Web Interface Access: Firewall Rule Adjustments in a Threat Detection Lab
+
+After completing the installation of **Security Onion** in my **Threat Detection and Monitoring Lab** on a VMware virtual machine, I encountered an issue when trying to access the web interface. The management interface for Security Onion was set to the IP address **192.168.114.5**, and I had configured the network using **NAT** to share IPs between the VM and my host machine.
+
+I was able to **ping** the Security Onion instance from my host machine, confirming connectivity, but the web interface was inaccessible when I tried using the same IP address.
+
+#### Investigating the Issue: Services Running but No Web Access
+
+To begin troubleshooting, I checked the status of Security Onion services by running:
+
+```bash
+sudo so-status
+```
+
+The command confirmed that all services were running as expected, indicating there were no issues preventing the system from functioning properly. Below is an image showing the output, which indicates the system’s health.
+
+![so-status output showing services running](image_placeholder_here)
+
+Since the services were operational, I turned my attention to the firewall configuration.
+
+## Initial Troubleshooting: Firewall Configuration
+
+I suspected that the firewall was blocking access to the web interface. I tried using the **so-allow** command, which typically adds IP addresses to the firewall whitelist. However, **this command was not supported** in the version of Security Onion I was using, which was **2.4.110-20241010**.
+
+To get more insights into the firewall rules, I ran the following command to list the current settings:
+
+```bash
+sudo iptables -nvL
+```
+
+This gave me a clear view of the firewall rules, confirming that access to the management interface was restricted. The output (image below) showed which IP addresses were currently allowed to communicate with Security Onion.
+
+![iptables output showing firewall rules](image_placeholder_here)
+
+## Solution: Modifying Firewall Rules to Grant Access
+
+To resolve the issue, I needed to modify the firewall rules to allow access from my host machine. I used the **so-firewall** command to include a broader range of IPs temporarily for testing:
+
+```bash
+sudo so-firewall includehost analyst 192.168.0.0/16
+sudo so-firewall apply
+```
+
+After applying the change, I successfully accessed the Security Onion web interface from my **Windows 10 machine** with the IP **192.168.1.10**. The image below shows the Security Onion GUI after gaining access.
+
+![Security Onion GUI accessed](image_placeholder_here)
+
+#### Rethinking Security: Narrowing Access to a Specific IP
+
+While the broad **192.168.0.0/16** range worked, it presented a security risk by allowing too many devices on the network to access the web interface. In a real-world environment, minimizing the attack surface is crucial. To restrict access further, I decided to limit web interface access to just my **host machine** with IP **192.168.114.1**.
+
+### Configuring a More Secure Firewall Rule
+
+I had already configured **Vmnet8 NAT** in VMware to distribute IP addresses from **192.168.114.10** to **192.168.114.254**. The **Security Onion instance** was assigned the static IP **192.168.114.5**, and the NAT gateway was **192.168.114.2**. My host machine had the IP **192.168.114.1**, and I wanted only this IP to access Security Onion.
+
+## Solution: Modifying Firewall Rules to Grant Access via the GUI
+
+To resolve the issue of web interface access, I decided to modify the firewall rules. Instead of using command-line , I opted to adjust the settings via Security Onion's **GUI**.
+
+### Step-by-Step Firewall Modification Using the GUI
+
+I navigated to **Administration > Configuration > Firewall > Hostgroup > Analyst** within the Security Onion interface. I removed the broad range previously set and configured the firewall to allow access only to **192.168.114.1**.
+
+This change immediately went into effect, successfully limiting access to my host machine while blocking others. The **Windows 10 machine** (IP **192.168.1.10**) could no longer access the Security Onion web interface, whereas my host machine continued to maintain access as shown below.
+
+![Access restricted to 192.168.114.1](image_placeholder_here)
+
+This limited access to only **192.168.114.1**, my host machine’s IP address. As a result, other devices, such as my **Windows 10 machine** (with IP **192.168.1.10**), were no longer able to access the Security Onion web interface. Below is an image showing successful access from the host machine while blocking access from others.
+
+![Access restricted to 192.168.114.1](image_placeholder_here)
+
+![Image of final working configuration](image_placeholder_here)
 
 
 
