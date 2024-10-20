@@ -1,0 +1,43 @@
+Expanding on the previous explanation, if you're using **pfSense** and want to send traffic from **LAN1** (where your two workstations and server are) to **Security Onion** on **LAN2**, while using a SPAN port, here's how you can do it:
+
+### 1. **Network Setup Overview**:
+- **LAN1**: Contains your two workstations and a server.
+- **LAN2**: Hosts your **Security Onion** instance, which will be analyzing the network traffic.
+- **pfSense**: Your firewall/router, which you configure to mirror traffic from LAN1 to LAN2 (where Security Onion is located).
+
+### 2. **Steps to Mirror Traffic from LAN1 to LAN2 (Security Onion)**:
+
+#### **1. Set up the SPAN (Mirror) Port on pfSense:**
+- In pfSense, configure the SPAN port on **LAN1**. Let’s assume the traffic from the two workstations and server on LAN1 should be monitored.
+- The SPAN port will be configured to **copy all traffic from LAN1 ports** to a designated port (let’s call this Port X) where **Security Onion** can receive it for analysis.
+
+#### **2. Mirror LAN1 Traffic:**
+- You'll configure the pfSense firewall to mirror traffic from the **LAN1 interface** to another interface (or port) on pfSense that is connected to **LAN2**, where Security Onion resides.
+- Essentially, you’re telling pfSense: “Take everything that happens on LAN1 and copy it to LAN2.”
+  
+#### **3. Send Traffic to Security Onion on LAN2**:
+- Once the SPAN port is configured to mirror traffic from LAN1, pfSense will send the **mirrored (copied) traffic** to LAN2, where your Security Onion is connected.
+- **Security Onion**, which is a network security monitoring (NSM) and intrusion detection system (IDS), will then capture, inspect, and analyze the traffic coming from LAN1.
+
+### **How the Flow Works:**
+- **Workstations and server on LAN1** communicate normally (e.g., sending/receiving data across the network).
+- The SPAN port on pfSense will **copy all this traffic** (both incoming and outgoing data from LAN1).
+- The copied traffic is sent to the **LAN2 network**, where **Security Onion** is set up.
+- **Security Onion** will receive this traffic on its monitoring interface and start performing deep packet inspection, log analysis, and security monitoring on it.
+
+### **Visual Representation**:
+
+```
+LAN1 (Workstations & Server) --> pfSense (SPAN Port) --> LAN2 (Security Onion)
+```
+
+### **Security Onion Role**:
+- **Traffic Analysis**: Security Onion will analyze the mirrored traffic for potential threats, anomalies, or suspicious activity.
+- **IDS/IPS**: It uses tools like **Snort**, **Suricata**, or **Zeek** to detect intrusions or malicious behavior in the network traffic.
+- **Network Visibility**: You'll be able to see all the traffic, logs, and alerts from LAN1 in Security Onion's dashboard.
+
+### **Final Overview**:
+- The two workstations and server on LAN1 function normally, but every packet of data they send or receive is duplicated by the SPAN port in pfSense and forwarded to LAN2.
+- **Security Onion** sitting in LAN2 captures this mirrored traffic for analysis. You can then use Security Onion’s tools to view alerts, logs, or suspicious patterns in the traffic.
+  
+In summary, you are using the **SPAN port** as a mechanism to copy traffic from **LAN1** and sending it to **Security Onion** on **LAN2** for advanced network monitoring and security analysis.

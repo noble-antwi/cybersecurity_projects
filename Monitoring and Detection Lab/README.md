@@ -102,7 +102,7 @@ As indicated in the table above, the intefcae em2, on th pfsense will be used as
 
 ### Creating Firewall Rules with pfSense Web Interface
 
-The Table below will serve as a guide for the set up. The content of the tabke is an extension from  the one above.
+The Table below will serve as a guide for the set up. The content of the table is an extension from  the one above.
 
 | IP Subnet       | Network Connection | Role   | PfSense Interface | VMware Adapter  |
 |-----------------|--------------------|--------|-------------------|-----------------|
@@ -209,7 +209,7 @@ Per the topology, Ubuntu server which will host the Splunk software will be inst
 In the setup of Security Onion, I will be using three network adapters namely
 
 1. NAT : Used for the managment
-2. Vmnet3 : will be used as the span port and.
+2. Vmnet3 : Mirror Interface.
 3. Vmnet5 : will be used to collect the logs collection. 
 
 In the setup, ens160 has been desginated as the Managment Interface.
@@ -313,6 +313,86 @@ This limited access to only **192.168.114.1**, my host machine’s IP address. A
 ![Access restricted to 192.168.114.1](image_placeholder_here)
 
 ![Image of final working configuration](image_placeholder_here)
+
+
+## Installing Windows Server 2022
+The windows server 2022 was installed successfuly and placed on Vmet2 which is serving as the internal network as depicted below
+
+| IP Subnet       | Network Connection | Role   | PfSense Interface | VMware Adapter  |
+|-----------------|--------------------|--------|-------------------|-----------------|
+| 192.168.114.0/24 | NAT                | WAN    | em0               | Network Adapter |
+| 192.168.1.0/24   | VMNet2             | LAN    | em1               | Network Adapter 2 |
+| No IP Address    | VMNet3             | SPAN   | em2               | Network Adapter 3 |
+| 192.168.3.0/24   | VMNet4             | KALI   | em3               | Network Adapter 4 |
+| 192.168.4.0/24   | VMNet5             | SECONION | em4              | Network Adapter 5 |
+| 192.168.5.0/24   | VMNet6             | SPLUNK | em5               | Network Adapter 6 |
+
+![WinServer](files/images/045WinServerInstalled.png)
+From the IP configuration layout below, teh Server would have obtained its IP addess from pfSense that had already been configured as the DCH server.
+| pfSencse Interface | IP Address|DHCP Enabled? | Range of DHCP IP |
+|----------- | ----------| -----------|-------------------|
+|WAN (em0) | 192.168.114.10 (auto assigned)| Acquired From host | Will Revert|
+|LAN (em1) | 192.168.1.254 | Yes | 192.168.1.10 to 192.168.1.253|
+|OPT1 (em2)    | No IP Address configured (used as a Span Port)| Not Required Since it is a Span Port   | Not Required|
+|OPT2 (em3) | 192.168.3.254 | Yes | 192.168.3.10 to 192.168.3.253|
+|OPT3 (em4) | 192.168.4.254 | Yes | 192.168.4.10 to 192.168.4.253|
+|OPT4 (em5) | 192.168.5.254 | Yes | 192.168.5.10 to 192.168.5.253|
+
+It is however imperative to note that a server obtaining its IP address from DCHP  not be wise to do as other clients will be depending on the server for services. 
+From the range above, teh reserved IP range for VMnet2 whuch the server recides in is from ```192.168.1.1 to 192.168.1.9```.
+I will therofre assign a static IP of ```192.168.1.1``` and set the Gateway as the IP of the pfSense and and set the DNS as the server IP with the seconday been that of ```8.8.8.8```
+![DNSSetup](files/images/046DNSSetUp.png). The firewall was tunred off and the security also tunred off in order to simulate the attack laer in the project.
+The server name was also changed to srv1 and then rebooted for the changes to take effect
+
+I started to add the Active DIrecotry to the Server in order to maek it the Domain Cocntroller.
+![Installing AD](files/images/048ActiveDirectoryDomainServicesBeenAdded.png)
+
+After the installaiont i promoted teh server to be a domain controller and then set the Root Domain Name as ```biira.com```
+![Setting Root Domain Name](files/images/049SettingRootDomainName.png)
+The domain and forest functional levels were set to 2016 for backwak compatibility asn thent the DSRM password set accordingly. it then set the NetBios name as BIIRA which was good. The NTDS and SYSVOL file were kept in the default folders. Below is the script generated which can later be used to do AD promotion to domain controller
+```powershell
+#
+# Windows PowerShell script for AD DS Deployment
+#
+
+Import-Module ADDSDeployment
+Install-ADDSForest `
+-CreateDnsDelegation:$false `
+-DatabasePath "C:\Windows\NTDS" `
+-DomainMode "WinThreshold" `
+-DomainName "biira.com" `
+-DomainNetbiosName "BIIRA" `
+-ForestMode "WinThreshold" `
+-InstallDns:$true `
+-LogPath "C:\Windows\NTDS" `
+-NoRebootOnCompletion:$false `
+-SysvolPath "C:\Windows\SYSVOL" `
+-Force:$true
+````
+I encounted a failur on my first trail due to the fact that i do not have alocal admin passowrd set on the server and hence had to fix that.
+![Failed Attempt](files/images/050FailedAttempt.png)
+The installation was able to proceed successfuly as the password issue was fixed.
+![Fixed Problem with Psswrod](files/images/051FixedProblem.png)
+![Installation Completed](files/images/052ServerUpRUnnning.png)
+
+After the isntallation, I created an organisational Unit (OU) called ```CyberMonitoringLab``` with groups and hen users which were later added to the group Below is a Video demonstration of part of the activity.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
