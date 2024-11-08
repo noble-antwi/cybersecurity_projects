@@ -16,60 +16,233 @@ By walking through the step-by-step process of building this lab, from initial n
 
 The following sections will detail each component of the lab, the rationale behind design choices, and the potential security scenarios that can be explored within this virtual ecosystem.
 
-1. Network Architecture
-   - Network Design and Segmentation
-   - IP Schema and Subnet Allocation
+## Network Architecture
 
-2. Infrastructure Setup
-   - VMware Installation
-   - pfSense Configuration
-     - Interface Assignment
-     - IP Configuration
-     - Firewall Rules
-   - Windows 10 Installation
+![Architectural Diagram](<files/architecture/DEtection and Monitoring Project.drawio.png>)
+The cybersecurity home lab is designed with a segmented network architecture to simulate real-world scenarios and provide isolated environments for different purposes. This design allows for effective separation of attack simulations, monitoring, and defensive operations.
 
-3. Security Tools Deployment
-   - Kali Linux Installation
-   - Metasploitable Setup
-   - Security Onion Installation and Configuration
-   - Splunk Installation on Ubuntu Server
+### Network Design and Segmentation
 
-4. Active Directory Environment
-   - Windows Server 2022 Installation
-   - Active Directory Domain Services Setup
-   - Creating and Managing Users and Groups
-   - Joining Windows 10 to Domain
+The lab is divided into six distinct network segments, each serving a specific purpose:
 
-5. Vulnerability Introduction
-   - Implementing Vulnerable Active Directory
-   - Potential Attack Vectors
+1. **External Network (WAN)**: Simulates internet connectivity.
+2. **Internal LAN**: Represents a typical corporate network.
+3. **SPAN Port**: Used for network traffic mirroring and analysis.
+4. **Attacker Network**: Isolated segment for offensive security tools.
+5. **Security Onion Network**: Dedicated to log collection and analysis.
+6. **Splunk Network**: Separate segment for the Splunk log collector.
 
-6. Log Forwarding and Monitoring
-   - Configuring Splunk to Receive Logs
-   - Setting Up Windows Event Forwarding
+### IP Schema and Subnet Allocation
 
-7. Network Segmentation and Traffic Mirroring
-   - Configuring SPAN Ports
-   - Bridging LAN to SPAN
+The following table outlines the IP schema and subnet allocation for each network segment:
 
-8. Troubleshooting and Optimization
-   - Resolving Firewall Issues
-   - Optimizing Network Performance
+| Network Segment | Subnet | PfSense Interface | VMware Adapter | Purpose |
+|-----------------|--------|-------------------|----------------|---------|
+| External (WAN) | 192.168.114.0/24 | em0 | Network Adapter (NAT) | Internet simulation |
+| Internal LAN | 192.168.1.0/24 | em1 | Network Adapter 2 (VMNet2) | Corporate network |
+| SPAN Port | No IP Address | em2 | Network Adapter 3 (VMNet3) | Traffic mirroring |
+| Attacker | 192.168.3.0/24 | em3 | Network Adapter 4 (VMNet4) | Offensive tools |
+| Security Onion | 192.168.4.0/24 | em4 | Network Adapter 5 (VMNet5) | Log collection |
+| Splunk | 192.168.5.0/24 | em5 | Network Adapter 6 (VMNet6) | Log analysis |
 
-9.  Future Expansions and Improvements
+### PfSense Interface and DHCP Configuration
+
+PfSense serves as the central router and firewall, managing traffic between network segments. The following table details the PfSense interface configurations and DHCP settings:
+
+| PfSense Interface | IP Address | DHCP Enabled | DHCP Range |
+|-------------------|------------|--------------|------------|
+| WAN (em0) | 192.168.114.10 (auto) | No (Acquired from host) | N/A |
+| LAN (em1) | 192.168.1.254 | Yes | 192.168.1.10 - 192.168.1.253 |
+| SPAN (em2) | No IP Address | No | N/A |
+| Attacker (em3) | 192.168.3.254 | Yes | 192.168.3.10 - 192.168.3.253 |
+| Security Onion (em4) | 192.168.4.254 | Yes | 192.168.4.10 - 192.168.4.253 |
+| Splunk (em5) | 192.168.5.254 | Yes | 192.168.5.10 - 192.168.5.253 |
+
+### Key Components and Their Network Placement
+
+1. **PfSense**: Central router and firewall, connected to all network segments.
+2. **Windows 10 Workstation**: Placed in the Internal LAN (192.168.1.X).
+3. **Kali Linux**: Located in the Attacker network (192.168.3.10).
+4. **Metasploitable**: Vulnerable system placed in the Internal LAN (192.168.1.X).
+5. **Windows Server 2022 (Domain Controller)**: Assigned a static IP in the Internal LAN (192.168.1.1).
+6. **Security Onion**: Management interface on External network (192.168.114.5), with additional interfaces for traffic capture and log collection.
+7. **Splunk**: Placed in its dedicated network for log analysis (192.168.5.0/24).
+
+This network architecture provides a robust environment for simulating various cybersecurity scenarios, from attack simulations to defensive monitoring and log analysis. The segmentation allows for isolated testing while maintaining the ability to monitor traffic across different network zones.
+
+Based on the information provided in your README file, I'll provide a detailed and professional explanation of the infrastructure setup for your cybersecurity home lab, focusing on VMware installation, pfSense configuration, and Windows 10 installation.
+
+## Infrastructure Setup
+
+### VMware Installation
+
+VMware Workstation was chosen as the virtualization platform for this lab due to its robust features and ability to create isolated networks. The installation process was straightforward, and the following virtual networks were created:
+
+| Network Name | Purpose |
+|--------------|---------|
+| VMNet2 | Internal LAN |
+| VMNet3 | SPAN Port |
+| VMNet4 | Attacker Network |
+| VMNet5 | Security Onion Network |
+| VMNet6 | Splunk Network |
+
+These virtual networks provide the necessary segmentation for different components of the lab, allowing for isolated testing and monitoring.
+
+### pfSense Installation and  Configuration
+
+pfSense is an open-source firewall and router platform that offers comprehensive network security and management features. Acting as the central component of the network infrastructure, pfSense plays a pivotal role in ensuring reliable connectivity, secure traffic management, and network segmentation.
+
+#### Interface Assignment
+
+In this setup, a pfSense virtual machine (VM) was deployed with six network adapters, each mapped to a specific VMware virtual network (VMNet). This configuration facilitates robust network segmentation and allows controlled communication between different virtual environments. Below is a detailed description of the setup:
+
+| Network Adapter | VMNet |
+|-----------------|-------|
+| Network Adapter | NAT |
+| Network Adapter 2 | VMNet2 |
+| Network Adapter 3 | VMNet3 |
+| Network Adapter 4 | VMNet4 |
+| Network Adapter 5 | VMNet5 |
+| Network Adapter 6 | VMNet6 |
+
+**Network Adapter 1 (NAT):** Serves as the WAN interface for pfSense, connecting it to an external network via VMware’s NAT service, simulating internet access.
+**Network Adapters 2-6:** Each is mapped to a different isolated VMNet, representing separate subnets used for various virtual lab components such as workstations, monitoring tools, and security appliances.
+
+#### Initial WAN Interface Issue and Resolution
+
+Upon initial configuration, the WAN interface (Network Adapter 1) did not acquire an IP address. This was traced to the VMware NAT service being stopped on the host machine. The issue was resolved by restarting the VMware NAT service, allowing the WAN interface to obtain an IP address of 192.168.114.10/24. This IP address was dynamically assigned by the host system, enabling the pfSense VM to connect to external networks.
+
+#### IP Configuration
+
+Each interface on pfSense was configured with distinct IP settings to manage the traffic flow and provide network services:
+
+| pfSense Interface | IP Address | DHCP Enabled? | DHCP Range |
+|-------------------|------------|---------------|------------|
+| WAN (em0) | 192.168.114.10 (auto) | No (Acquired from host) | N/A |
+| LAN (em1) | 192.168.1.254 | Yes | 192.168.1.10 - 192.168.1.253 |
+| SPAN (em2) | No IP Address | No | N/A |
+| Kali (em3) | 192.168.3.254 | Yes | 192.168.3.10 - 192.168.3.253 |
+| SecOnion (em4) | 192.168.4.254 | Yes | 192.168.4.10 - 192.168.4.253 |
+| Splunk (em5) | 192.168.5.254 | Yes | 192.168.5.10 - 192.168.5.253 |
+
+**WAN (em0):** This is the external-facing interface, configured to receive its IP address from the host system via VMware’s NAT.
+**LAN (em1):** Acts as the primary internal network interface, with DHCP enabled to allocate IP addresses between 192.168.1.10 and 192.168.1.253 for connected devices.
+**SPAN (em2):** Configured without an IP address, this interface is used for traffic mirroring, allowing network monitoring tools to analyze and capture packets without being part of the routed network.
+**Kali (em3):** Connected to a network segment for the Kali Linux VM, with DHCP providing IPs within the 192.168.3.x range.
+**SecOnion (em4):** Used for the Security Onion environment, a network monitoring and intrusion detection system, with its own DHCP pool in the 192.168.4.x range.
+**Splunk (em5):** Configured for a Splunk instance to analyze and visualize logs, with DHCP allocating IPs in the 192.168.5.x range.
+
+**SPAN Interface Purpose**
+
+The SPAN (Switched Port Analyzer) interface is configured without an IP address to function solely as a traffic mirror. This setup allows it to replicate network traffic to monitoring systems for inspection and analysis, enhancing the lab’s capability for security auditing and troubleshooting.
+
+This configuration of pfSense with multiple network adapters mapped to VMware virtual networks creates a versatile and secure lab environment. The segmentation into dedicated subnets allows each connected virtual machine to interact as needed while maintaining strong security boundaries and enabling detailed traffic analysis through the SPAN interface.
+
+#### Firewall Rules Configuration in pfSense
+
+In a lab environment, it is often necessary to configure firewall rules that allow flexibility for testing and monitoring network interactions without restrictions. For this reason, permissive firewall rules were created on pfSense to ensure seamless communication across different network segments. Below is a detailed breakdown of the rules applied to the various interfaces.
+
+#### 1. **WAN Interface Rules**
+
+- **Configuration**: A rule was created to allow all inbound and outbound traffic on the WAN interface.
+- **Purpose**: This setup facilitates unrestricted external connectivity for the lab, ensuring that test environments requiring internet access or communication with external services can do so without hindrance.
+- **Security Note**: Allowing all traffic on the WAN interface is highly insecure for production environments. In real-world scenarios, WAN rules should be tightly controlled to permit only essential traffic to prevent unauthorized access and potential threats.
+
+#### 2. **LAN Interface Rules**
+
+- **Configuration**: Similar to the WAN interface, the LAN interface was configured with a rule allowing all traffic.
+- **Purpose**: This approach simplifies communication between connected devices on the LAN network, making it easier to test services, applications, and network flows without facing connectivity issues.
+- **Security Consideration**: For production networks, this rule should be modified to include only specific allowed traffic to protect sensitive data and systems. Best practices involve defining rules that limit access based on IP address, port, and protocol.
+
+#### 3. **Rules for Other Interfaces (e.g., Kali, SecOnion, Splunk)**
+
+- **Configuration**: Each of the other interfaces (em3, em4, em5) was set up with rules allowing all traffic.
+- **Purpose**: These permissive rules ensure smooth traffic flow across the entire lab environment, which is vital when testing network monitoring, intrusion detection systems (e.g., Security Onion), or log analysis tools (e.g., Splunk). Full traffic access enables comprehensive testing of security configurations, network performance, and data flow analysis.
+- **Security Consideration**: While such open rules are acceptable in isolated lab environments, they pose significant security risks if used in production. In practical applications, these rules should be restricted to allow only necessary traffic. For instance, limiting traffic to specific sources, destinations, or service ports can help minimize exposure to potential security threats.
+
+### Best Practices for Production Use
+
+- **Restrict Traffic**: Replace permissive "allow all" rules with rules that define specific sources, destinations, and allowed services.
+- **Use Firewall Aliases**: To simplify rule management, use aliases to group IP addresses or networks and apply rules efficiently.
+- **Enable Logging**: Activate logging for critical rules to monitor and analyze traffic patterns for potential issues or unauthorized access attempts.
+- **Regular Review**: Periodically review and update rules to adapt to changing security requirements and network structures.
+
+### Windows 10 Installation and Configuration
+
+A Windows 10 virtual machine (VM) was installed and connected to VMNet2, which represents the internal LAN segment managed by the pfSense router. This setup serves to validate the network configuration and simulate a typical client environment within the lab.
+
+**Network Configuration and IP Assignment**
+
+- **DHCP Assignment:** The Windows 10 VM successfully received an IP address of 192.168.1.10 from the DHCP server configured on the pfSense LAN interface (em1). This automatic IP assignment confirms that the pfSense DHCP service is functioning as expected and properly managing the 192.168.1.x subnet.
+- **Subnet Details:** The LAN interface, em1, is set up with an IP address of 192.168.1.254, acting as the default gateway for devices within this subnet.
+  
+**Client Machine Role and Connectivity**
+**Purpose**: The Windows 10 VM acts as a client machine on the internal network, enabling various use cases such as:
+
+- **Accessing Network Resources:** Testing connectivity to other devices and services in the lab.
+- **Network Configuration Testing**: Verifying that the internal network is properly segmented and isolated from other network interfaces.
+- **Application Testing:** Simulating user interaction with applications hosted within the lab.
+  
+**Web Configurator Access:** The Windows 10 VM can access the pfSense web configurator by navigating to *<http://192.168.1.254>.* This allows administrators to make real-time adjustments to the pfSense configuration from within the internal network.
+Benefits of This Configuration
+Network Validation: The successful DHCP assignment and connectivity confirm that pfSense is properly routing and managing traffic within the 192.168.1.x subnet.
+Testing Environment: The Windows 10 client provides a platform for testing firewall rules, connectivity to security tools (such as Security Onion and Splunk), and the overall lab setup.
+Based on the information provided in your README file, I'll provide a detailed and professional explanation of the security tools deployment for your cybersecurity home lab, focusing on Kali Linux, Metasploitable, Security Onion, and Splunk installation.
+
+## Security Tools Deployment
+
+### Kali Linux Installation and Configuration
+
+Kali Linux, a popular open-source penetration testing and security assessment distribution, was successfully installed and configured as part of the lab environment. This instance was designed to represent an attacker’s position, allowing security assessments and testing of defensive measures.
+
+#### **Network Configuration**
+- **Assigned Interface**: The Kali Linux VM was connected to **VMNet4**, creating a dedicated network segment.
+- **IP Address Range**: The `192.168.3.0/24` subnet was configured for this segment, managed by pfSense.
+- **Kali Machine IP Address**: The VM was assigned a static IP of `192.168.3.10`, ensuring consistency for testing scenarios.
+
+#### **Internet Connectivity**
+The pfSense firewall was configured to allow the Kali Linux instance to access the internet. This connectivity is essential for:
+- **System Updates**: Keeping the Kali Linux distribution and its tools up to date.
+- **Tool Downloads**: Installing additional security tools required for penetration testing and advanced assessments.
+- **External Resource Access**: Simulating real-world attacker behaviors that rely on external connectivity.
+
+#### **Purpose and Use in the Lab Environment**
+The inclusion of Kali Linux serves several important roles in the lab setup:
+- **Attacker Simulation**: Placing Kali Linux in its own network segment (`VMNet4`) simulates an external or isolated attacker's position. This helps test how well the internal network and other systems respond to potential security threats.
+- **Penetration Testing**: Kali Linux is equipped with numerous tools for vulnerability scanning, network discovery, password attacks, and exploitation. It can be used to evaluate the robustness of the security measures in place within the lab.
+- **Security Assessments**: Administrators can use Kali to perform controlled tests on other network segments (such as those hosting Security Onion or Splunk) to verify their monitoring, detection, and response capabilities.
+
+### Metasploitable 2 Setup and Configuration
+
+**Metasploitable 2** is an intentionally vulnerable Linux distribution used for testing and learning about security vulnerabilities and exploitation techniques. Its inclusion in the lab provides a safe environment for practicing penetration testing and enhancing cybersecurity skills.
+
+#### **Network Configuration**
+
+- **Assigned Interface**: The Metasploitable 2 VM was connected to **VMNet2**, which represents the **Internal Network/LAN** segment.
+- **IP Assignment**: The machine was automatically assigned an IP address of `192.168.1.11` by the pfSense DHCP server, confirming proper integration with the network and connectivity to other lab devices.
+- **Default Login Credentials**: 
+  - **Username**: `msfadmin`
+  - **Password**: `msfadmin`
+
+#### **Accessing the Metasploitable 2 Interface**
+The **Metasploitable 2 web interface** can be accessed through a web browser at `http://192.168.1.11`. This interface provides access to various vulnerable services and applications, including:
+
+- **Damn Vulnerable Web App (DVWA)**: A PHP/MySQL web application designed to help security professionals and enthusiasts practice common web vulnerabilities, such as SQL injection, XSS (cross-site scripting), and command injection.
+
+#### **Purpose and Use in the Lab**
+
+The installation and configuration of Metasploitable 2 serve multiple purposes within the lab environment:
+
+- **Realistic Exploitation Scenarios**: Provides a practical target for security testing, allowing the use of tools like **Kali Linux** for launching simulated attacks and evaluating potential vulnerabilities.
+- **Vulnerability Assessments**: Users can perform in-depth scans and analysis using various security tools (e.g., **Nmap**, **Metasploit Framework**) to identify weaknesses and explore exploitation techniques.
+- **Training and Learning**: Offers a controlled platform for practicing ethical hacking, developing custom scripts for testing, and understanding how different vulnerabilities can be exploited and remediated.
 
 
-
-
-
-
-
-========================================================================================================================
-
+### Security Onion Installation and Configuration
 
 **Security Onion** is a powerful, open-source Linux distribution optimized for network security monitoring, intrusion detection, and threat hunting. Tailored for cybersecurity professionals, it aggregates multiple advanced tools into a cohesive environment to aid in the proactive detection, monitoring, and response to cyber threats across both network and endpoint layers. Security Onion’s comprehensive suite of pre-configured security tools supports network traffic analysis, alerting, endpoint monitoring, and log management.
 
-### Key Components of Security Onion
+#### Key Components of Security Onion
 
 1. **Intrusion Detection Systems (IDS)**:
    - **Snort** and **Suricata**: Security Onion includes both Snort and Suricata as IDS options, each capable of deep packet inspection to identify malicious behavior in network traffic. These tools use signature-based and anomaly-based detection methods, ensuring real-time alerts and detection for a range of attack types.
@@ -110,60 +283,318 @@ The following sections will detail each component of the lab, the rationale behi
    - **Playbook Automation**: Automated playbooks can be created to streamline incident response activities, including alerting, threat validation, containment, and escalation.
    - **SOAR Capabilities**: Security Onion can be integrated with Security Orchestration, Automation, and Response (SOAR) tools for automated response actions, further enhancing incident handling capabilities.
 
-### Summary
+#### **Network Configuration Overview**
 
-In summary, Security Onion serves as an all-in-one solution for network security monitoring, threat detection, and incident response. Its integrated toolkit—spanning IDS, NTA, log management, endpoint monitoring, and forensic analysis—empowers security professionals to maintain visibility, streamline security operations, and improve the organization’s overall cybersecurity posture. Additionally, with support for tools like Arkime, The Hive, Wazuh, FleetDM, and Cortex, Security Onion offers advanced flexibility and scalability, making it an adaptable and powerful choice for enterprise environments.
+- **Management Interface (ens160)**: Configured with a static IP of `192.168.114.5`, connected to the NAT network. This interface handles administrative tasks and provides access to the Security Onion web interface.
+- **Mirror Interface**: Connected to **VMNet3**, designated for capturing mirrored traffic. This interface monitors and inspects network traffic from other segments of the lab, simulating real-world intrusion detection scenarios.
+- **Log Collection Interface**: Connected to **VMNet5** for dedicated log collection, ensuring efficient data handling and separation from other network operations.
 
---- 
+#### **Initial Setup and Configuration**
 
-
-
-## Network and IP Schema for Security Lab Infrastructure
-
-Here's a table in Markdown format based on the subnet and IP address details you provided:
-
-
-| Description                    | Subnet / IP Address      |
-|---------------------------------|--------------------------|
-| External Subnet                 | 192.168.114.0/24         |
-| Internal LAN Subnet             | 192.168.1.0/24           |
-| SPAN Port IP Address            | No IP Address            |
-| Attacker Subnet                 | 192.168.3.0/24           |
-| Security Onion Logs Subnet      | 192.168.4.0/24           |
-| Splunk Log Collector Subnet     | 192.168.5.0/24           |
-| Metasploitable IP Address       | Through DHCP             |
-| ADC IP Address                  | 192.168.1.1            |
-| PC1 IP Address                  | 192.168.1.10             |
-| Attacker IP Address             | Through DHCP             |
-| Splunk IP Address               | Through DHCP             |
-| Security Onion IP Address       | 192.168.114.50           |
-| Security Onion MGMT IP Address  | 192.168.114.1            |
-| DNS                             | 8.8.8.8, 4.4.4.4         |
+1. **Management Interface IP Assignment**:
+   - **Static IP**: `192.168.114.5`
+   - **Gateway**: `192.168.114.2`
+   - **DNS Domain**: Set to `biira.com` for network identification and testing purposes.
+2. **Web Interface Access**:
+   - **URL**: `https://192.168.114.5/`
+   - **Username**: `noble@biira.com` for login and administration.
+3. **System Updates**:
+   - The `sudo soup` command was run to apply the latest patches and enhancements, ensuring that Security Onion is up to date and fortified against known vulnerabilities.
 
 
-This table neatly organizes the subnet and IP address information for easy reference.
+### Security Onion Installation and Troubleshooting in the Threat Detection and Monitoring Lab
+
+After completing the installation of **Security Onion** in my **Threat Detection and Monitoring Lab** hosted on a VMware virtual machine, I faced an issue when attempting to access the web interface. The management interface was configured with the IP address **192.168.114.5**, and I had set the network to **NAT** to share IPs between the VM and my host machine.
+
+### Initial Connectivity Check
+
+I verified network connectivity by **pinging** the Security Onion instance from my host machine. The ping was successful, confirming that the VM and the host were on the same network and communicating correctly. Despite this, accessing the web interface via `https://192.168.114.5/` was unsuccessful.
+
+### Service Status Check: Ensuring System Health
+
+To investigate further, I ran the following command to check the status of Security Onion services:
+
+```bash
+sudo so-status
+```
+
+The output confirmed that all core services were running properly, which indicated that the system itself was functioning correctly and there were no underlying service-related issues. Below is an example of the `so-status` output indicating operational services.
+
+![so-status output showing services running](image_placeholder_here)
+
+### Investigating Firewall Configuration
+
+Suspecting the issue was related to firewall settings, I reviewed the configuration. I attempted to use the **so-allow** command to add my host machine’s IP to the firewall whitelist. However, in **Security Onion version 2.4.110-20241010**, the **so-allow** command was not supported.
+
+To view the current firewall rules, I ran:
+
+```bash
+sudo iptables -nvL
+```
+
+This command provided detailed information on the firewall configuration and confirmed that the access to the management interface was restricted. The `iptables` output showed which IPs were allowed to communicate with the system.
+
+![iptables output showing firewall rules](image_placeholder_here)
+
+### Resolving the Issue: Modifying Firewall Rules
+
+To grant access to the web interface, I modified the firewall rules using the **so-firewall** command to include a broader IP range:
+
+```bash
+sudo so-firewall includehost analyst 192.168.0.0/16
+sudo so-firewall apply
+```
+
+After applying these changes, I could successfully access the Security Onion web interface from my **Windows 10 machine** with the IP **192.168.1.10**. The image below shows the Security Onion GUI after successful access.
+
+![Security Onion GUI accessed](image_placeholder_here)
+
+
+This troubleshooting process highlights the importance of checking both service status and firewall configurations when diagnosing connectivity issues. By modifying the firewall rules with `so-firewall`, I enabled the necessary access to the Security Onion management interface, ensuring the lab environment's functionality and readiness for further security monitoring and analysis.
+
+
+#### **Firewall Configuration**
+
+The initial configuration allowed a broad IP range (`192.168.0.0/16`) to facilitate testing across various network segments. This approach was suitable for initial setup and verification but was refined for better security:
+
+- **Final Restriction**: Access was limited to the host machine's IP (`192.168.114.1`) for improved security. This ensures that only the host can reach the Security Onion management interface.
+- **Configuration Path**: The final firewall adjustments were made using the Security Onion GUI:
+  - **Navigation**: `Administration > Configuration > Firewall > Hostgroup > Analyst`
+  - **Hostgroup**: The access group was updated to include only the host IP of `192.168.114.1`.
+
+#### **Role in the Lab Environment**
+
+- **Network Traffic Monitoring**: The mirror interface captures packets, enabling real-time analysis of network activity. This feature helps identify anomalies and potential threats within the internal lab network.
+- **Intrusion Detection**: Security Onion integrates with tools like Suricata and Zeek to provide comprehensive intrusion detection capabilities, highlighting suspicious activities and generating alerts.
+- **Log Management**: The log collection interface supports storing and processing logs from various sources, ensuring detailed visibility into system and network events.
+
+Thank you for adding more details! Here's the complete, personalized write-up that includes your experience with setting up Splunk, configuring the Universal Forwarder on the Domain Controller, and other relevant sections:
+
+## Installing and Configuring Splunk on Ubuntu Server
+
+Setting up Splunk in my **Threat Detection and Monitoring Lab** was a critical step for centralizing log management and enhancing visibility across the network. I deployed Splunk on an **Ubuntu Server** connected to the **192.168.5.0/24** network (VMNet6) to act as the main platform for log collection and analysis.
+
+### Ubuntu Server Configuration Journey
+
+Initially, my Ubuntu Server was assigned a dynamic IP (`192.168.5.11/24`) by the **pfSense DHCP server**. The pfSense DHCP settings reserved IP leases starting from `192.168.5.10` to `192.168.5.253`, ensuring no conflicts with other services. For stability and ease of management, I reconfigured the server with a **static IP** (`192.168.5.1`), crucial for consistent communication with key infrastructure, including the **Domain Controller** at `192.168.1.1`.
+
+### Installing Splunk: Step by Step
+
+To set up Splunk, I used the following commands:
+
+```bash
+wget -O splunk-9.3.1-0b8d769cb912-linux-2.6-amd64.deb "https://download.splunk.com/products/splunk/releases/9.3.1/linux/splunk-9.3.1-0b8d769cb912-linux-2.6-amd64.deb"
+sudo dpkg -i splunk-9.3.1-0b8d769cb912-linux-2.6-amd64.deb
+```
+
+### Overcoming Installation Challenges
+
+To make installation smoother, especially when copying and pasting commands, I installed the **Ubuntu Desktop GUI**:
+
+```bash
+sudo apt install ubuntu-desktop
+```
+
+This made the server environment more user-friendly for additional configurations.
+
+![Ubuntu Desktop Installed](files/images/059UbuntuDesktop.png)
+
+### Configuring Splunk for Auto-Start
+
+To ensure Splunk would start automatically after reboots, I enabled the boot-start feature:
+
+```bash
+sudo /opt/splunk/bin/splunk enable boot-start
+```
+
+**Administrator Name**: `noble_antwi`
+
+### Starting Splunk and Web Interface Access
+
+I launched Splunk for the first time with:
+
+```bash
+sudo /opt/splunk/bin/splunk start --accept-license
+```
+
+The web interface became accessible at `http://127.0.0.1:8000`. To maintain consistent log collection from devices like the **Domain Controller**, I ensured the server retained its static IP configuration (`192.168.5.1`).
+
+### Configuring the Domain Controller to Forward Logs to Splunk
+
+The next step was to set up a Splunk Universal Forwarder on the **Domain Controller** (`192.168.1.1`) to send Windows logs to the Splunk instance for analysis. I downloaded **Splunk Universal Forwarder 9.3.1** for Windows from the [Splunk website](https://www.splunk.com/en_us/download/universal-forwarder.html#) and transferred the installation package to the Domain Controller.
+
+After completing the installation, I configured the `inputs.conf` file to specify which event logs should be sent to Splunk:
+
+```powershell
+[WinEventLog://Application]
+disabled = 0
+
+[WinEventLog://Security]
+disabled = 0
+
+[WinEventLog://System]
+disabled = 0
+```
+
+This setup allowed the Domain Controller to forward **Application**, **Security**, and **System** logs to Splunk for in-depth analysis and monitoring.
+
+ I also created a video tutorial showcasing the setup process step-by-step for better clarity.
+
+Certainly! Here's a more comprehensive and professional version of the Active Directory environment setup, focusing on the key details for the cybersecurity lab:
+
+---
+
+## Active Directory Environment Setup
+
+### 1. **Windows Server 2022 Installation and Configuration**
+
+Windows Server 2022 was installed on a virtual machine (VM) and placed within the internal network (VMnet2) for the cybersecurity home lab. The lab architecture is designed to replicate real-world scenarios with multiple subnets and network segments, as outlined in the following table:
+
+| IP Subnet        | Network Connection | Role       | pfSense Interface | VMware Adapter   |
+|------------------|--------------------|------------|-------------------|------------------|
+| 192.168.114.0/24 | NAT                | WAN        | em0               | Network Adapter  |
+| 192.168.1.0/24   | VMnet2             | LAN        | em1               | Network Adapter 2|
+| 192.168.3.0/24   | VMnet4             | KALI       | em3               | Network Adapter 4|
+| 192.168.4.0/24   | VMnet5             | SECONION   | em4               | Network Adapter 5|
+| 192.168.5.0/24   | VMnet6             | SPLUNK     | em5               | Network Adapter 6|
+
+Initially, the server was configured to obtain an IP address dynamically via the pfSense DHCP server. However, to ensure consistency and reliable network performance in a production environment, a static IP configuration was applied to the server:
+
+- **Static IP Address**: 192.168.1.1
+- **Subnet Mask**: 255.255.255.0
+- **Default Gateway**: 192.168.1.254 (pfSense LAN interface)
+- **Primary DNS**: 192.168.1.1 (self-referential for Active Directory DNS)
+- **Secondary DNS**: 8.8.8.8 (Google DNS for fallback)
+
+To simulate a vulnerable testing environment, the following security measures were deliberately disabled on the server:
+
+- Windows Firewall was turned off.
+- Windows Defender and other built-in security features were disabled.
+
+The server was renamed "srv1" to reflect its role as the primary domain controller (DC), and a reboot was performed to apply these changes.
+
+### 2. **Active Directory Domain Services (AD DS) Setup**
+
+Active Directory Domain Services (AD DS) was installed using the Server Manager's "Add Roles and Features" wizard. Following the installation, the server was promoted to a domain controller with the following configuration:
+
+- **Root Domain Name**: biira.com
+- **Forest Functional Level**: Windows Server 2016
+- **Domain Functional Level**: Windows Server 2016
+- **Domain Controller Options**:
+  - **DNS Server**: Installed and configured automatically.
+  - **Global Catalog**: Enabled.
+  - **Read-only Domain Controller (RODC)**: Not selected.
+
+A Directory Services Restore Mode (DSRM) password was set to ensure the ability to recover from potential AD corruption or other disaster scenarios.
+
+Additionally, the NetBIOS domain name was automatically set to **BIIRA**, derived from the full domain name **biira.com**. The default paths for the NTDS database and SYSVOL share were accepted:
+
+- **NTDS Database Path**: C:\Windows\NTDS
+- **Log Files Path**: C:\Windows\NTDS
+- **SYSVOL Path**: C:\Windows\SYSVOL
+
+A PowerShell script was generated to facilitate the process for future use or automated deployments:
+
+```powershell
+Import-Module ADDSDeployment
+Install-ADDSForest `
+-CreateDnsDelegation:$false `
+-DatabasePath "C:\Windows\NTDS" `
+-DomainMode "WinThreshold" `
+-DomainName "biira.com" `
+-DomainNetbiosName "BIIRA" `
+-ForestMode "WinThreshold" `
+-InstallDns:$true `
+-LogPath "C:\Windows\NTDS" `
+-NoRebootOnCompletion:$false `
+-SysvolPath "C:\Windows\SYSVOL" `
+-Force:$true
+```
+
+### 3. **Creating and Managing Users and Groups**
+
+Once the server was successfully promoted to a domain controller, an Organizational Unit (OU) named **CyberMonitoringLab** was created within Active Directory to organize domain objects for lab-specific configurations and testing. Under this OU, groups and users were created to simulate a typical organizational structure, providing a realistic environment for testing.
+
+### Implementing Vulnerable Active Directory
+
+To create a realistic testing environment for cybersecurity scenarios, the Active Directory environment was deliberately made vulnerable using a script from a public GitHub repository. This approach allows for the rapid deployment of a complex, insecure AD structure that mimics real-world misconfigurations.
+
+The vulnerability script was downloaded and executed using PowerShell with the following commands:
+
+```powershell
+IEX((new-object net.webclient).downloadstring("https://raw.githubusercontent.com/wazehell/vulnerable-AD/master/vulnad.ps1"));
+Invoke-VulnAD -UsersLimit 100 -DomainName "biira.com"
+```
+
+This script, named `vulnad.ps1`, is designed to create a vulnerable AD environment automatically. The `Invoke-VulnAD` function was called with specific parameters:
+
+- `UsersLimit 100`: This parameter sets the number of fake user accounts to be created.
+- `DomainName "biira.com"`: This specifies the domain name for the vulnerable AD environment.
+
+The script likely implemented several types of misconfigurations commonly found in real-world Active Directory environments, such as:
+
+1. Weak Password Policies
+2. Excessive Privileges
+3. Misconfigured Group Policies
+4. Insecure Service Accounts
+5. Kerberos Misconfigurations
+6. Unsafe Delegations
+7. Unpatched Systems
+8. Clear-text Passwords
+9. Weak ACLs
+10. Trust Relationships
+
+### Potential Attack Vectors
+
+The vulnerabilities introduced by the script open up several potential attack vectors that are commonly exploited in real-world scenarios:
+
+1. **Password Spraying**: Attackers can attempt to gain access using common or weak passwords across multiple accounts.
+
+2. **Privilege Escalation**: Misconfigured permissions allow attackers to elevate their privileges within the domain.
+
+3. **Lateral Movement**: Weak segmentation and excessive permissions enable attackers to move laterally across the network.
+
+4. **Kerberos Attacks**: Misconfigurations in Kerberos settings can be exploited for attacks like Golden Ticket or Silver Ticket.
+
+5. **Domain Privilege Abuse**: Overly permissive settings on domain objects can be abused to gain domain admin rights.
+
+6. **Group Policy Exploitation**: Misconfigured Group Policies can be leveraged to deploy malicious scripts or gain system access.
+
+7. **Service Account Compromise**: Weak service account passwords or excessive permissions can be exploited for persistent access.
+
+8. **NTLM Relay Attacks**: Misconfigured systems may allow for NTLM credential relay attacks.
+
+9. **DCSync Attacks**: Improper AD replication permissions might allow unauthorized domain replication.
+
+10. **Forest Trust Abuse**: Misconfigured forest trusts can be exploited to gain access across different domains.
+
+This vulnerable Active Directory environment provides a rich testing ground for various attack scenarios and defensive strategies. It allows cybersecurity professionals to practice identifying and exploiting common AD misconfigurations, develop and test detection mechanisms for AD-based attacks, improve incident response procedures for AD compromise scenarios, and understand the impact of poor AD hygiene on overall network security.
+
+### 4. **Joining a Windows 10 Client to the Domain**
+
+To complete the AD setup and integrate a client machine into the domain, a Windows 10 system was configured to join the **biira.com** domain. The steps for domain joining are outlined below:
+
+1. Ensure the Windows 10 client is on the same network segment (VMnet2) as the domain controller, ensuring network connectivity.
+2. Verify that the Windows 10 client can resolve the domain name **biira.com** using the domain controller as its DNS server.
+3. Change the computer name on the client machine if necessary.
+4. Join the domain by accessing the **System Properties** dialog (right-click **This PC > Properties > Change Settings > Change**).
+5. Enter the domain name **biira.com** and provide domain administrator credentials to authenticate the client machine into the domain.
+6. Restart the client machine to complete the domain join process.
+
+After joining the domain, the Windows 10 client was able to authenticate against the domain controller, and domain resources were accessible based on the user’s permissions.
+
+## Security Testing and Vulnerability Simulation
 
 
 
-## IP Subnet and Interface Mapping for PfSense Virtual Lab
 
+========================================================================================================================
 
-| Role      | Interface | Network Adapter | VMNet    |
-|-----------|-----------|-----------------|----------|
-| WAN       | EM0       | Network Adapter  | NAT   |
-| LAN       | EM1       | Network Adapter 2 | VMNet2   |
-| SPAN      | EM2       | Network Adapter 3 | VMNet3   |
-| KALI      | EM3       | Network Adapter 4 | VMNet4   |
-| SECONION  | EM4       | Network Adapter 5 | VMNet5   |
-| SPLUNK    | EM5       | Network Adapter 6 | VMNet6   |
-
-
-## Installations
 1. VMware
 2. Windows 10
 ![Windows10Installed](files/images/001Win10Installed.png)
 
-3. Installations of pfSense
+1. Installations of pfSense
    Per the topology above, the pfsesne will have 6 interfaces which is idicate below.
    The configuration is.
 
@@ -202,7 +633,7 @@ After completing th einterface assigment, all the interfaces are now showing as 
 The next thing to do is to set IP addresses and then set all of them. STARING WITH THE lan INTERFACES.
 In this step however, I have decided to assign each interfaces the last IP in the ranges i will be using.
 I also Enabled http on the LAN in order to access the firewall Graphically.
-The URL to access the web configurator is *http://192.168.1.254*
+The URL to access the web configurator is *<http://192.168.1.254>*
 
 | pfSencse Interface | IP Address|DHCP Enabled? | Range of DHCP IP |
 |----------- | ----------| -----------|-------------------|
@@ -242,7 +673,7 @@ image below
 
 ![IP Auto Assigend to the Windows Instance](files/images/010IPAutoAssinged.png)
 
-The web configurator URL as indicated earlier can be assessed via  *http://192.168.1.254*
+The web configurator URL as indicated earlier can be assessed via  *<http://192.168.1.254>*
 Entering the URL in windows opens up the web configurator as shown below:
 
 In the first web interface set up
@@ -286,153 +717,11 @@ In the Bridges tab, I will then forward all traffic from the LAN port to the SPA
 ![Lan to Span](files/images/016LantoSpan.png)
 ![BridgedLanTOSPan](files/images/017DoneBridge.png)
 
-### Creatinf FIrewall Rules
 
-1. On the WAN network I configured traffic to be allowed with no restrictions.
-![Wan FIrewall](files/images/018WANFirewall.png)
-
-2. On th LAN, the Default Firewall Rule was deleted and then created a new rule to allow all traffic.
-   ![Lan Forwall Rule](files/images/019LanRUle.png)
-3. ALl other ports were confirigures the smae way to allow for communication from any port to 
-
-## Installing Kali Linux
-
-Kali Linux has been installed and assigned to VMnet4 interface which will ensure it obtaines IP address in the.
-ragne from 192.168.3.0/24 network but it starts from 192.168.3.10.
-THe Kali maachine therefore has the IP address of 192.168.3.10 as indicated below. It ill also be reacherable to the interenet through the
-pfsense firewall configuration.
-![Kali Installaion](files/images/020KaliINstallaiontandIPConfiguration.png)
-
-## Installing Metasplloitable
-
-The installation of this Vulnerable box is places on VMnet2 which is representing the Internal Netowkr or LAN. SInce the pfSense is also working as a DHCP it automatically leases out the next IP after thr one it had already leased to the Windows 10 instance which also fell in the LAN network. The IP address given to the Metasploitable Instance is 192.168.1.11 as can be seen from the Image below:
-
-![Automatic IP Assignment](files/images/022MetaspoitableObtainesIP.png)
-Mestappitable has an automatic user name of ```msfadmin``` and and correspingin password or ```msfadmin```.
-The Metaspoitable 2 GUI can therefore be accessed at http:192.168.1.11 as indicated below
-![Metaspitable2Intarface](files/images/023MetsaplitableGUI.png)
-
-This also gives me the optint o have a graphical interface access to the other components likes the Damn Vulnerable Web App (DVWA).
-
-![DVWA](files/images/024DVWA.png)
-
-## Installing Ubuntu Server
-
-Per the topology, Ubuntu server which will host the Splunk software will be installed on the 192.168.5.0/24 network whhich is configured to be on Vmnet6
-![Ubuntu Server Configuration](files/images/025UbuntuServerNetworkSetup.png)
-
-## Installation of Security Onion
-
-In the setup of Security Onion, I will be using three network adapters namely
-
-1. NAT : Used for the managment
-2. Vmnet3 : Mirror Interface.
-3. Vmnet5 : will be used to collect the logs collection. 
-
-In the setup, ens160 has been desginated as the Managment Interface.
-![MgmtInterface](files/images/026ManagmentIntSecOnion.png)
-
-The Managemnet Interface was then assign a static IP address of 192.168.114.5 which is the IP from the vmnet8 adapter that has the NAT configuration on teh host machine
-![Host IP](files/images/027Vmnet8HostIP.png)
-![Host IP Second](files/images/028Vment8OnPC.png)
-![VM Ware Set up](files/images/029VmwareSetup.png)
-
-The Gateway IP is 192.168.114.2 as indicated below
-![Gateway IP Below](files/images/030GatewayNAT.png)
-
-IN the NAT Ocnfiguration i did as can be seen from the images above, The automatic IP assignemtn starts from  192.168.114.10 to  192.168.114.254. The static IPS are from  192.168.114.1- 192.168.114.9. However, the  192.168.114.1 has been assigned to the Hposy PV VMWare network adaptor as shown above whist the  192.168.114.2 is used as the Gateway. This therfore implies that, the available Static IP addresses available to assign are from  192.168.114.3 to  192.168.114.9.
-
-I will hoever assign the  192.168.114.5 to the SecurityOnion Management Interface.
-
-![Mgmt Interface IP Assigned](files/images/031MgntIPAssign.png)
-
-I then set the Default Gateway to 192.168.114.2 as indicated earlier in the NAT configuration and then also set the DNS to *biira.com*
-![alt text](files/images/032SecOnio.png)
-
-The URL to access the Security Onion Console (SOC) Interface is https://192.168.114.5/.
-The SOC Username as set is noble@biira.com with the password known to myself. Lol
-
-After installation, I ran the ```sudo soup``` command to ensure that my Security Onion instance was up to date with the latest security patches and software enhancements. This step is crucial for maintaining the integrity and security of the system, as it ensures that all detection tools like Zeek and Suricata are operating with the most current features and protections.
-
-Keeping Security Onion updated with sudo soup helps enhance stability, ensures compatibility with other tools, and fortifies the system against known vulnerabilities—critical aspects in any security-focused environment.
-
----
-
-### Configuring Security Onion Web Interface Access: Firewall Rule Adjustments in a Threat Detection Lab
-
-After completing the installation of **Security Onion** in my **Threat Detection and Monitoring Lab** on a VMware virtual machine, I encountered an issue when trying to access the web interface. The management interface for Security Onion was set to the IP address **192.168.114.5**, and I had configured the network using **NAT** to share IPs between the VM and my host machine.
-
-I was able to **ping** the Security Onion instance from my host machine, confirming connectivity, but the web interface was inaccessible when I tried using the same IP address.
-
-#### Investigating the Issue: Services Running but No Web Access
-
-To begin troubleshooting, I checked the status of Security Onion services by running:
-
-```bash
-sudo so-status
-```
-
-The command confirmed that all services were running as expected, indicating there were no issues preventing the system from functioning properly. Below is an image showing the output, which indicates the system’s health.
-
-![so-status output showing services running](image_placeholder_here)
-
-Since the services were operational, I turned my attention to the firewall configuration.
-
-## Initial Troubleshooting: Firewall Configuration
-
-I suspected that the firewall was blocking access to the web interface. I tried using the **so-allow** command, which typically adds IP addresses to the firewall whitelist. However, **this command was not supported** in the version of Security Onion I was using, which was **2.4.110-20241010**.
-
-To get more insights into the firewall rules, I ran the following command to list the current settings:
-
-```bash
-sudo iptables -nvL
-```
-
-This gave me a clear view of the firewall rules, confirming that access to the management interface was restricted. The output (image below) showed which IP addresses were currently allowed to communicate with Security Onion.
-
-![iptables output showing firewall rules](image_placeholder_here)
-
-## Solution: Modifying Firewall Rules to Grant Access
-
-To resolve the issue, I needed to modify the firewall rules to allow access from my host machine. I used the **so-firewall** command to include a broader range of IPs temporarily for testing:
-
-```bash
-sudo so-firewall includehost analyst 192.168.0.0/16
-sudo so-firewall apply
-```
-
-After applying the change, I successfully accessed the Security Onion web interface from my **Windows 10 machine** with the IP **192.168.1.10**. The image below shows the Security Onion GUI after gaining access.
-
-![Security Onion GUI accessed](image_placeholder_here)
-
-#### Rethinking Security: Narrowing Access to a Specific IP
-
-While the broad **192.168.0.0/16** range worked, it presented a security risk by allowing too many devices on the network to access the web interface. In a real-world environment, minimizing the attack surface is crucial. To restrict access further, I decided to limit web interface access to just my **host machine** with IP **192.168.114.1**.
-
-### Configuring a More Secure Firewall Rule
-
-I had already configured **Vmnet8 NAT** in VMware to distribute IP addresses from **192.168.114.10** to **192.168.114.254**. The **Security Onion instance** was assigned the static IP **192.168.114.5**, and the NAT gateway was **192.168.114.2**. My host machine had the IP **192.168.114.1**, and I wanted only this IP to access Security Onion.
-
-## Solution: Modifying Firewall Rules to Grant Access via the GUI
-
-To resolve the issue of web interface access, I decided to modify the firewall rules. Instead of using command-line , I opted to adjust the settings via Security Onion's **GUI**.
-
-### Step-by-Step Firewall Modification Using the GUI
-
-I navigated to **Administration > Configuration > Firewall > Hostgroup > Analyst** within the Security Onion interface. I removed the broad range previously set and configured the firewall to allow access only to **192.168.114.1**.
-
-This change immediately went into effect, successfully limiting access to my host machine while blocking others. The **Windows 10 machine** (IP **192.168.1.10**) could no longer access the Security Onion web interface, whereas my host machine continued to maintain access as shown below.
-
-![Access restricted to 192.168.114.1](image_placeholder_here)
-
-This limited access to only **192.168.114.1**, my host machine’s IP address. As a result, other devices, such as my **Windows 10 machine** (with IP **192.168.1.10**), were no longer able to access the Security Onion web interface. Below is an image showing successful access from the host machine while blocking access from others.
-
-![Access restricted to 192.168.114.1](image_placeholder_here)
-
-![Image of final working configuration](image_placeholder_here)
 
 
 ## Installing Windows Server 2022
+
 The windows server 2022 was installed successfuly and placed on Vmet2 which is serving as the internal network as depicted below
 
 | IP Subnet       | Network Connection | Role   | PfSense Interface | VMware Adapter  |
@@ -446,6 +735,7 @@ The windows server 2022 was installed successfuly and placed on Vmet2 which is s
 
 ![WinServer](files/images/045WinServerInstalled.png)
 From the IP configuration layout below, teh Server would have obtained its IP addess from pfSense that had already been configured as the DCH server.
+
 | pfSencse Interface | IP Address|DHCP Enabled? | Range of DHCP IP |
 |----------- | ----------| -----------|-------------------|
 |WAN (em0) | 192.168.114.10 (auto assigned)| Acquired From host | Will Revert|
@@ -455,7 +745,7 @@ From the IP configuration layout below, teh Server would have obtained its IP ad
 |OPT3 (em4) | 192.168.4.254 | Yes | 192.168.4.10 to 192.168.4.253|
 |OPT4 (em5) | 192.168.5.254 | Yes | 192.168.5.10 to 192.168.5.253|
 
-It is however imperative to note that a server obtaining its IP address from DCHP  not be wise to do as other clients will be depending on the server for services. 
+It is however imperative to note that a server obtaining its IP address from DCHP  not be wise to do as other clients will be depending on the server for services.
 From the range above, teh reserved IP range for VMnet2 whuch the server recides in is from ```192.168.1.1 to 192.168.1.9```.
 I will therofre assign a static IP of ```192.168.1.1``` and set the Gateway as the IP of the pfSense and and set the DNS as the server IP with the seconday been that of ```8.8.8.8```
 ![DNSSetup](files/images/046DNSSetUp.png). The firewall was tunred off and the security also tunred off in order to simulate the attack laer in the project.
@@ -467,6 +757,7 @@ I started to add the Active DIrecotry to the Server in order to maek it the Doma
 After the installaiont i promoted teh server to be a domain controller and then set the Root Domain Name as ```biira.com```
 ![Setting Root Domain Name](files/images/049SettingRootDomainName.png)
 The domain and forest functional levels were set to 2016 for backwak compatibility asn thent the DSRM password set accordingly. it then set the NetBios name as BIIRA which was good. The NTDS and SYSVOL file were kept in the default folders. Below is the script generated which can later be used to do AD promotion to domain controller
+
 ```powershell
 #
 # Windows PowerShell script for AD DS Deployment
@@ -486,6 +777,7 @@ Install-ADDSForest `
 -SysvolPath "C:\Windows\SYSVOL" `
 -Force:$true
 ````
+
 I encounted a failur on my first trail due to the fact that i do not have alocal admin passowrd set on the server and hence had to fix that.
 ![Failed Attempt](files/images/050FailedAttempt.png)
 The installation was able to proceed successfuly as the password issue was fixed.
@@ -495,20 +787,24 @@ The installation was able to proceed successfuly as the password issue was fixed
 After the isntallation, I created an organisational Unit (OU) called ```CyberMonitoringLab``` with groups and then users which were later added to the group Below is a Video demonstration of part of the activity.
 After teh step above, I need to make the active Directory Vulneabrle in order to expose it to many attakcs.
 The first thig i did was to doanload a script from a githunb repo that will be run to make the AD vulnearle
-Source to the Vulneable Script on gihub is https://github.com/safebuffer/vulnerable-AD
+Source to the Vulneable Script on gihub is <https://github.com/safebuffer/vulnerable-AD>
 The command below helpe dto download the script called vulnad.pas1
-``` powershell 
+
+``` powershell
 IEX((new-object net.webclient).downloadstring("https://raw.githubusercontent.com/wazehell/vulnerable-AD/master/vulnad.ps1"));
 
 ```
-The script was then invoked to run withteh commnand below. 
+
+The script was then invoked to run withteh commnand below.
+
 ```
 
 ``` powershell
 Invoke-VulnAD -UsersLimit 100 -DomainName "biira.com"
 ```
+
 ![Fake Accounts](files/images/052ServerUpRUnnning.png)
-The scripts created lots of users that i did not create first and more details of the script will eb explaine dlater. 
+The scripts created lots of users that i did not create first and more details of the script will eb explaine dlater.
 
 With the installed script, teh following attakcs can now be executed on the Active DIrectroy:
 Abusing ACLs/ACEs
@@ -527,9 +823,10 @@ SMB Signing Disabled
 ![VUlnerable AD](files/images/054VuleAD.png)
 
 ## Joining Windows10 to Domain
+
 In order to accomplish this, I first change the DNS configuration on the host machine so teh Preffered DNS Server will the IP address of the windpos Server whils the LAternate will be that from google, 8.8.8.8
 ![DNS](files/images/055SettingDNSforHost.png)
-In the systems properties of the Host machine,  changed the name to pc1 and then restarted the machine first before tying to join the domain controller. 
+In the systems properties of the Host machine,  changed the name to pc1 and then restarted the machine first before tying to join the domain controller.
 
 I then changed from work grup to doamin and then inout the domain name as biira.com. I then joined the Administrator first to the domain by inptuing the username and its coreresponding passowrd.
 
@@ -550,12 +847,11 @@ wget -O splunk-9.3.1-0b8d769cb912-linux-2.6-amd64.deb "https://download.splunk.c
 sudo dpkg -i splunk-9.3.1-0b8d769cb912-linux-2.6-amd64.deb
 
 ```
+
 Well, i needed to copy and pasete the command above on my Ubuntu Server Terminal but i was having a problem with it so i decided to install the Ubunut GUi with the command ```sudo apt install ubuntu-desktop```
 ![Ubuntu Desktop Installed](files/images/059UbuntuDesktop.png)
 
-
 I enable Splnk to start on boot with teh command
-
 
 ``` bash
 sudo /opt/splunk/bin/splunk enable boot-start
@@ -570,13 +866,13 @@ Splunk will hten be moved to the opt folder and i can start with the command
 sudo /opt/splunk/bin/splunk start --accept-license
 ```
 
-The splunik interface is then accessible with the url http://127.0.0.1:8000
+The splunik interface is then accessible with the url <http://127.0.0.1:8000>
 In the previois onfiguration, spkunk was cnfigured to be on Vmnet6 and will received an automatic IP which is hte ciurrent case However, Since SPlunk is going to be playing a very imporatnt role int he setup, it has to be on a static IP so  we do not have any confuguration challenges later should the IP change as the Acive Direcotry will be forwarding logs to it as well for monitoring. Since it is on Vmnet6, the IP range The will be 192.168.5.1
 he current IP address for hteh UBuntu serever hositng SPlunk is 192.168.5.11/24 obtained from teh pfsense. NB: In the pfsense settings for DHCP it will start leasing IP address from  192.168.5.110 to 192.168.5.253. This ip is on inerface ens32 on Ubuntu Server as shown below
 Ther are two ways to make the change of IP. One can be on the server itself or from the pfsense settings. SInce pfsense already has a reserved IP from 192.168.5.1 to 192.18.5.9, i will rather rest the IP on the Ubuntu server itself by first moving to the direcory ```/etc/netplan```. Ahter wjich i will loate teh file ```90-NM-7fa2bb2b-abd5-39d1-a648-0c15abce21ef.yaml``` and open it with sudo command in order to make editing to it. ```sudo nano 90-NM-7fa2bb2b-abd5-39d1-a648-0c15abce21ef.yaml```
-The content of the file is 
+The content of the file is
 
-``` bash 
+``` bash
 network:
   version: 2
   ethernets:
@@ -592,9 +888,10 @@ network:
           ipv6.method: "disabled"
           ipv6.ip6-privacy: "-1"
           proxy._: ""
-``` 
+```
 
-WHich i edited to 
+WHich i edited to
+
 ``` bash
   GNU nano 7.2                                                                            90-NM-7fa2bb2b-abd5-39d1-a648-0c15abce21ef.yaml *                                                                                   
 network:
@@ -632,7 +929,6 @@ DNS Servers: Three DNS servers are listed:
 192.168.1.1: This is the local DNS server, which is your Domain Controller, added last in the list. The system will use this one if the others don’t respond or if local domain resolution is required.
 NetworkManager: This section allows the interface ens32 to be managed by NetworkManager. It includes details like the UUID (a unique identifier) and some IPv6-related settings (which are disabled here).
 
-
 ![Setup](files/images/062StatiIPUbuntu.png)
 In order to apply the changes, i hit the command ```sudo netplan apply``` which change the IP Configuration as seen below afyer running the ```ip addr`` command
 
@@ -654,6 +950,7 @@ noble_antwi@splunkubuntu:/etc/netplan$ ip addr
 noble_antwi@splunkubuntu:/etc/netplan$ 
 
 ```
+
 ![Static IP](files/images/063StaticIPconfiguration.png)
 
 ## Configruation on Splunk to Receive Logs and also Indexing for Windows Server
@@ -661,10 +958,12 @@ noble_antwi@splunkubuntu:/etc/netplan$
 In the video below i use teh opportnity to set up a splunk receining end on port 9997 and alse set up a node(more like a buket) called index to hold the logs that will come from WIndows Server. The name given to the index is  ```windowServerLogs```
 
 ## Setting Up Forwarder on Windows Server
-In the next step, i need to set up forwarder on the host which is the Domain controller to forward its logs to Splunk for analysYS.
-I complterd the downlload of Splunk Enterprise 9.3.1 for Windows on the we website of splnk using the URL https://www.splunk.com/en_us/download/universal-forwarder.html#  After the download has comeplted i copied it to the DOmain COntroller and installed it
 
- In aconfigured the inout.conf file in order for Splunk to see that data using the content 
+In the next step, i need to set up forwarder on the host which is the Domain controller to forward its logs to Splunk for analysYS.
+I complterd the downlload of Splunk Enterprise 9.3.1 for Windows on the we website of splnk using the URL <https://www.splunk.com/en_us/download/universal-forwarder.html#>  After the download has comeplted i copied it to the DOmain COntroller and installed it
+
+ In aconfigured the inout.conf file in order for Splunk to see that data using the content
+
  ``` powershell
 
  [WinEventLog://Application]
@@ -677,31 +976,21 @@ disabled = 0
 disabled = 0
 
 ````
-I have an explicit video on the set uo below.
 
-
-
-
-
-
-
-
-
+I have an explicit video on the set up below.
 
 ===================================================================================================
-
 
 [Link to the Architectural Diagram](https://drive.google.com/file/d/1L2Ri70p85bDrAMxXZyRc9m__X1sVpACT/view?usp=sharing)
 
 ### Comprehensive Home Lab Setup for Cybersecurity Testing and Monitoring
-
-
 
 ---
 
 ### Network Design and Segmentation
 
 #### 1. **Security Operations Network** (Better name: **Monitoring/Defense Network**)
+
 - **IP Range**: `192.168.3.0/24`
 - **Description**: This network is designated for Security Onion and other related defense tools such as Intrusion Detection Systems (IDS), Intrusion Prevention Systems (IPS), and log aggregation services. It will act as the nerve center for monitoring traffic, analyzing logs, and correlating events across the labs networks.
   
@@ -710,6 +999,7 @@ I have an explicit video on the set uo below.
   - **Additional monitoring tools**: Other tools like Grafana, Kibana, and ELK Stack can be deployed in the future to provide advanced visualization and data correlation.
 
 #### 2. **Victim Network** (Better name: **Corporate Network/Target Network**)
+
 - **IP Range**: `192.168.2.0/24`
 - **Description**: This network represents the internal, corporate-like environment that is simulated for victim systems. It will be the target of attacks launched from the Attacker Network. The key focus here is creating a realistic corporate domain structure with systems such as Domain Controllers, workstations, and potentially other internal services (e.g., file servers, web servers).
 - **Components**:
@@ -719,6 +1009,7 @@ I have an explicit video on the set uo below.
   - **Potential Expansion**: Additional systems (Linux servers, database servers, etc.) can be added as needed to increase the scope of attack simulations.
 
 #### 3. **Monitoring Network** (Better name: **Log Aggregation Network**)
+
 - **IP Range**: `192.168.4.0/24`
 - **Description**: This network contains the key log aggregation and monitoring systems, including Splunk. The purpose is to collect logs from all systems across the lab (Security Onion, victim systems, etc.) and provide a central point for analyzing logs, monitoring events, and correlating them to potential attacks.
 - **Components**:
@@ -727,28 +1018,30 @@ I have an explicit video on the set uo below.
   - **Scalability**: Other security monitoring solutions can be added to this segment to provide enhanced visibility or to test their integration with existing tools.
 
 #### 4. **Attacker Network** (Better name: **Penetration Testing/Threat Actor Network**)
+
 - **IP Range**: `192.168.1.0/24`
 - **Description**: This network is designed to simulate external attackers attempting to breach the victim environment. It is isolated from the other networks but connected via pfSense, which will handle routing and segmentation. The purpose here is to allow the launch of attacks from the attacker environment to the corporate network.
 - **Components**:
   - **Kali Linux**: (`192.168.1.10`) The attacker machine used to perform penetration testing, exploit vulnerabilities, and simulate real-world attacks. This machine will utilize tools like Metasploit, Nmap, and others to compromise the victim systems.
   - **Other Attack Tools** (optional): In the future, additional attack platforms (such as Parrot OS) can be added to introduce variability in the attack methods.
 
-
-
 ### Network Design Details
 
 #### **pfSense Firewall and Routing**
-- **IP Range**: Each network segment will be routed through **pfSense**, which serves as the core firewall and router, ensuring traffic flows securely between networks. 
-- **Firewall Rules**: 
+
+- **IP Range**: Each network segment will be routed through **pfSense**, which serves as the core firewall and router, ensuring traffic flows securely between networks.
+- **Firewall Rules**:
   - **Victim Network**: Strict rules should be in place to prevent unnecessary traffic between the Victim and Attacker networks. For example, the Victim Network should only allow certain types of incoming traffic from the Monitoring Network (e.g., for log collection and analysis).
   - **Attacker Network**: Traffic from the Attacker Network should be limited to predefined penetration testing scenarios.
   - **Monitoring Network**: Traffic should be allowed freely from the Monitoring Network to all other networks, as this network will collect logs and monitor all activity.
 
-#### **Network Security Layers**:
+#### **Network Security Layers**
+
 - **Internal Traffic Monitoring**: Security Onion and Splunk will be set up to capture network packets from the different segments and analyze them for anomalies. You can use **port mirroring** on the victim network to allow Security Onion to detect and analyze potential threats.
 - **Traffic Segregation**: Ensure all networks (Attacker, Victim, Monitoring) are properly isolated using pfSense to avoid unauthorized access between segments.
 
-#### **Future Expansions**:
+#### **Future Expansions**
+
 - **Additional Victim Machines**: You can expand the Victim Network with more workstations or servers, such as Linux servers, email servers, or web servers, to simulate a more complex environment.
 - **Advanced Attack Techniques**: Introduce more sophisticated attack tools or attackers in the future to simulate complex APT (Advanced Persistent Threat) attacks, ransomware infections, or phishing campaigns.
 - **Log Aggregation Expansion**: The Monitoring Network can include new tools as you grow your lab, such as **ELK stack** for advanced analytics or **Prometheus** for real-time monitoring.
@@ -770,17 +1063,11 @@ I have an explicit video on the set uo below.
 ---
 
 ### Diagram Overview
+
 For visualization, the architecture can be illustrated with a network diagram that represents the four network segments (Attacker, Victim, Monitoring, and Security Operations). This will show how pfSense acts as the routing layer, connecting each segment while ensuring proper segmentation and security controls.
 
 ---
 
-### Conclusion:
+### Conclusion
+
 This lab setup is ideal for simulating a variety of cybersecurity scenarios, including network intrusions, lateral movement, and monitoring of attack behavior. The use of pfSense for network segmentation ensures isolation, while tools like Security Onion and Splunk enable real-time analysis and monitoring. The lab is modular, allowing for future expansion in terms of both network devices and monitoring capabilities.
-
-
-
-
-
-
-
-
