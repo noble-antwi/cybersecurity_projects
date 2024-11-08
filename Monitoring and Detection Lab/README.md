@@ -1,15 +1,71 @@
-As part of the setup for this cybersecurity home lab, the primary goal is to simulate real-world scenarios by segmenting the environment into multiple isolated networks. This allows for the creation of distinct zones for attack simulations, monitoring, and defensive operations. Below is a comprehensive overview of the lab’s architecture and network configuration, followed by a detailed explanation of each component, its purpose, and suggested improvements.
+# CYBER THREAT DETECTION AND MONITORING LAB
 
-### Objectives of the Home Lab
+## Introduction
 
-1. **Simulate real-world attacks and defenses**: By creating isolated networks, this lab will allow for the simulation of cybersecurity attacks, defensive measures, and traffic analysis.
-2. **Isolate roles across networks**: Network segmentation ensures that attack traffic and victim traffic can be analyzed independently while maintaining a strong boundary between attacker, victim, and monitoring resources.
-3. **Implement monitoring tools**: Centralized monitoring solutions like Splunk and Security Onion will provide traffic capture, incident detection, and network visibility across the different segments.
-4. **Learn and practice threat detection and response**: The lab will offer an environment to understand how various tools work together in threat detection, network monitoring, and response processes.
+In the ever-evolving landscape of cybersecurity, hands-on experience is invaluable. This project details the creation of a robust cybersecurity home lab designed to simulate real-world scenarios, from network segmentation to active threat detection and vulnerability exploitation. The lab environment provides a safe, isolated space to practice offensive and defensive security techniques, enhancing skills in network security, system hardening, and incident response.
 
-Here’s an expanded description of Security Onion and its features, detailing each component and additional tools that enhance the platform’s capabilities. This version includes critical add-ons and optional integrations available with Security Onion for a fully robust security operations environment:
+This comprehensive setup includes:
 
----
+- A segmented network architecture using pfSense for routing and firewall management
+- Multiple virtual machines running various operating systems and security tools
+- A vulnerable Active Directory environment for practicing attack and defense scenarios
+- Security monitoring solutions like Security Onion and Splunk for log analysis and threat detection
+- Kali Linux for penetration testing and security assessments
+
+By walking through the step-by-step process of building this lab, from initial network design to the creation of a deliberately vulnerable Active Directory setup, this project offers insights into the complexities of modern cybersecurity infrastructures. It serves as both a learning tool for aspiring security professionals and a testbed for experienced practitioners to experiment with new tools and techniques in a controlled environment.
+
+The following sections will detail each component of the lab, the rationale behind design choices, and the potential security scenarios that can be explored within this virtual ecosystem.
+
+1. Network Architecture
+   - Network Design and Segmentation
+   - IP Schema and Subnet Allocation
+
+2. Infrastructure Setup
+   - VMware Installation
+   - pfSense Configuration
+     - Interface Assignment
+     - IP Configuration
+     - Firewall Rules
+   - Windows 10 Installation
+
+3. Security Tools Deployment
+   - Kali Linux Installation
+   - Metasploitable Setup
+   - Security Onion Installation and Configuration
+   - Splunk Installation on Ubuntu Server
+
+4. Active Directory Environment
+   - Windows Server 2022 Installation
+   - Active Directory Domain Services Setup
+   - Creating and Managing Users and Groups
+   - Joining Windows 10 to Domain
+
+5. Vulnerability Introduction
+   - Implementing Vulnerable Active Directory
+   - Potential Attack Vectors
+
+6. Log Forwarding and Monitoring
+   - Configuring Splunk to Receive Logs
+   - Setting Up Windows Event Forwarding
+
+7. Network Segmentation and Traffic Mirroring
+   - Configuring SPAN Ports
+   - Bridging LAN to SPAN
+
+8. Troubleshooting and Optimization
+   - Resolving Firewall Issues
+   - Optimizing Network Performance
+
+9.  Future Expansions and Improvements
+
+
+
+
+
+
+
+========================================================================================================================
+
 
 **Security Onion** is a powerful, open-source Linux distribution optimized for network security monitoring, intrusion detection, and threat hunting. Tailored for cybersecurity professionals, it aggregates multiple advanced tools into a cohesive environment to aid in the proactive detection, monitoring, and response to cyber threats across both network and endpoint layers. Security Onion’s comprehensive suite of pre-configured security tools supports network traffic analysis, alerting, endpoint monitoring, and log management.
 
@@ -76,7 +132,7 @@ Here's a table in Markdown format based on the subnet and IP address details you
 | Security Onion Logs Subnet      | 192.168.4.0/24           |
 | Splunk Log Collector Subnet     | 192.168.5.0/24           |
 | Metasploitable IP Address       | Through DHCP             |
-| ADC IP Address                  | 192.168.1.100            |
+| ADC IP Address                  | 192.168.1.1            |
 | PC1 IP Address                  | 192.168.1.10             |
 | Attacker IP Address             | Through DHCP             |
 | Splunk IP Address               | Through DHCP             |
@@ -91,12 +147,10 @@ This table neatly organizes the subnet and IP address information for easy refer
 
 ## IP Subnet and Interface Mapping for PfSense Virtual Lab
 
-Here's a table in Markdown format based on the information you provided:
-
 
 | Role      | Interface | Network Adapter | VMNet    |
 |-----------|-----------|-----------------|----------|
-| WAN       | EM0       | Network Adapter  | VMNet   |
+| WAN       | EM0       | Network Adapter  | NAT   |
 | LAN       | EM1       | Network Adapter 2 | VMNet2   |
 | SPAN      | EM2       | Network Adapter 3 | VMNet3   |
 | KALI      | EM3       | Network Adapter 4 | VMNet4   |
@@ -649,7 +703,8 @@ I have an explicit video on the set uo below.
 
 #### 1. **Security Operations Network** (Better name: **Monitoring/Defense Network**)
 - **IP Range**: `192.168.3.0/24`
-- **Description**: This network is designated for Security Onion and other related defense tools such as Intrusion Detection Systems (IDS), Intrusion Prevention Systems (IPS), and log aggregation services. It will act as the nerve center for monitoring traffic, analyzing logs, and correlating events across the lab’s networks.
+- **Description**: This network is designated for Security Onion and other related defense tools such as Intrusion Detection Systems (IDS), Intrusion Prevention Systems (IPS), and log aggregation services. It will act as the nerve center for monitoring traffic, analyzing logs, and correlating events across the labs networks.
+  
 - **Components**:
   - **Security Onion**: (`192.168.3.10`) A platform for monitoring, detecting, and responding to cybersecurity threats. This instance will capture logs, analyze network traffic, and provide visibility into attack vectors.
   - **Additional monitoring tools**: Other tools like Grafana, Kibana, and ELK Stack can be deployed in the future to provide advanced visualization and data correlation.
@@ -678,7 +733,7 @@ I have an explicit video on the set uo below.
   - **Kali Linux**: (`192.168.1.10`) The attacker machine used to perform penetration testing, exploit vulnerabilities, and simulate real-world attacks. This machine will utilize tools like Metasploit, Nmap, and others to compromise the victim systems.
   - **Other Attack Tools** (optional): In the future, additional attack platforms (such as Parrot OS) can be added to introduce variability in the attack methods.
 
----
+
 
 ### Network Design Details
 
