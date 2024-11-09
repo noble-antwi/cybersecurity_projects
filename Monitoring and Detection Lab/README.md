@@ -44,7 +44,7 @@ The cybersecurity home lab is designed with a segmented network architecture to 
 - **Components**:
   - **Splunk**: (`192.168.5.1`) A powerful platform for searching, monitoring, and analyzing machine-generated data from across the network.
   - **Grafana** (future potential): A real-time analytics tool that provides visualizations of network performance, security events, and system health data, pulling from sources like Splunk or other log collectors.
- 
+
 #### 4. **Attacker Network** (**Penetration Testing/Threat Actor Network**)
 
 - **IP Range**: `192.168.3.0/24`
@@ -54,7 +54,7 @@ The cybersecurity home lab is designed with a segmented network architecture to 
 
 #### 5. **pfSense Firewall and Routing**
 
-- **IP Range**: ` 192.168.4.0/24`
+- **IP Range**: `192.168.4.0/24`
 - **Description**: Each network segment will be routed through **pfSense**, which serves as the core firewall and router, ensuring traffic flows securely between networks.
 
 - **Traffic Segregation**: Ensure all networks (Attacker, Victim, Monitoring) are properly isolated using pfSense to avoid unauthorized access between segments.
@@ -182,7 +182,7 @@ In a lab environment, it is often necessary to configure firewall rules that all
 
 A Windows 10 virtual machine (VM) was installed and connected to VMNet2, which represents the internal LAN segment managed by the pfSense router. This setup serves to validate the network configuration and simulate a typical client environment within the lab.
 
-**Network Configuration and IP Assignment**
+#### Network Configuration and IP Assignment
 
 - **DHCP Assignment:** The Windows 10 VM successfully received an IP address of 192.168.1.10 from the DHCP server configured on the pfSense LAN interface (em1). This automatic IP assignment confirms that the pfSense DHCP service is functioning as expected and properly managing the 192.168.1.x subnet.
 - **Subnet Details:** The LAN interface, em1, is set up with an IP address of 192.168.1.254, acting as the default gateway for devices within this subnet.
@@ -207,18 +207,23 @@ Based on the information provided in your README file, I'll provide a detailed a
 Kali Linux, a popular open-source penetration testing and security assessment distribution, was successfully installed and configured as part of the lab environment. This instance was designed to represent an attacker’s position, allowing security assessments and testing of defensive measures.
 
 #### **Network Configuration**
+
 - **Assigned Interface**: The Kali Linux VM was connected to **VMNet4**, creating a dedicated network segment.
 - **IP Address Range**: The `192.168.3.0/24` subnet was configured for this segment, managed by pfSense.
 - **Kali Machine IP Address**: The VM was assigned a static IP of `192.168.3.10`, ensuring consistency for testing scenarios.
 
 #### **Internet Connectivity**
+
 The pfSense firewall was configured to allow the Kali Linux instance to access the internet. This connectivity is essential for:
+
 - **System Updates**: Keeping the Kali Linux distribution and its tools up to date.
 - **Tool Downloads**: Installing additional security tools required for penetration testing and advanced assessments.
 - **External Resource Access**: Simulating real-world attacker behaviors that rely on external connectivity.
 
 #### **Purpose and Use in the Lab Environment**
+
 The inclusion of Kali Linux serves several important roles in the lab setup:
+
 - **Attacker Simulation**: Placing Kali Linux in its own network segment (`VMNet4`) simulates an external or isolated attacker's position. This helps test how well the internal network and other systems respond to potential security threats.
 - **Penetration Testing**: Kali Linux is equipped with numerous tools for vulnerability scanning, network discovery, password attacks, and exploitation. It can be used to evaluate the robustness of the security measures in place within the lab.
 - **Security Assessments**: Administrators can use Kali to perform controlled tests on other network segments (such as those hosting Security Onion or Splunk) to verify their monitoring, detection, and response capabilities.
@@ -227,15 +232,16 @@ The inclusion of Kali Linux serves several important roles in the lab setup:
 
 **Metasploitable 2** is an intentionally vulnerable Linux distribution used for testing and learning about security vulnerabilities and exploitation techniques. Its inclusion in the lab provides a safe environment for practicing penetration testing and enhancing cybersecurity skills.
 
-#### **Network Configuration**
+#### Network Configuration
 
 - **Assigned Interface**: The Metasploitable 2 VM was connected to **VMNet2**, which represents the **Internal Network/LAN** segment.
 - **IP Assignment**: The machine was automatically assigned an IP address of `192.168.1.11` by the pfSense DHCP server, confirming proper integration with the network and connectivity to other lab devices.
-- **Default Login Credentials**: 
+- **Default Login Credentials**:
   - **Username**: `msfadmin`
   - **Password**: `msfadmin`
 
 #### **Accessing the Metasploitable 2 Interface**
+
 The **Metasploitable 2 web interface** can be accessed through a web browser at `http://192.168.1.11`. This interface provides access to various vulnerable services and applications, including:
 
 - **Damn Vulnerable Web App (DVWA)**: A PHP/MySQL web application designed to help security professionals and enthusiasts practice common web vulnerabilities, such as SQL injection, XSS (cross-site scripting), and command injection.
@@ -247,7 +253,6 @@ The installation and configuration of Metasploitable 2 serve multiple purposes w
 - **Realistic Exploitation Scenarios**: Provides a practical target for security testing, allowing the use of tools like **Kali Linux** for launching simulated attacks and evaluating potential vulnerabilities.
 - **Vulnerability Assessments**: Users can perform in-depth scans and analysis using various security tools (e.g., **Nmap**, **Metasploit Framework**) to identify weaknesses and explore exploitation techniques.
 - **Training and Learning**: Offers a controlled platform for practicing ethical hacking, developing custom scripts for testing, and understanding how different vulnerabilities can be exploited and remediated.
-
 
 ### Security Onion Installation and Configuration
 
@@ -312,7 +317,6 @@ The installation and configuration of Metasploitable 2 serve multiple purposes w
 3. **System Updates**:
    - The `sudo soup` command was run to apply the latest patches and enhancements, ensuring that Security Onion is up to date and fortified against known vulnerabilities.
 
-
 ### Security Onion Installation and Troubleshooting in the Threat Detection and Monitoring Lab
 
 After completing the installation of **Security Onion** in my **Threat Detection and Monitoring Lab** hosted on a VMware virtual machine, I faced an issue when attempting to access the web interface. The management interface was configured with the IP address **192.168.114.5**, and I had set the network to **NAT** to share IPs between the VM and my host machine.
@@ -360,9 +364,7 @@ After applying these changes, I could successfully access the Security Onion web
 
 ![Security Onion GUI accessed](image_placeholder_here)
 
-
 This troubleshooting process highlights the importance of checking both service status and firewall configurations when diagnosing connectivity issues. By modifying the firewall rules with `so-firewall`, I enabled the necessary access to the Security Onion management interface, ensuring the lab environment's functionality and readiness for further security monitoring and analysis.
-
 
 #### **Firewall Configuration**
 
@@ -503,6 +505,11 @@ Additionally, the NetBIOS domain name was automatically set to **BIIRA**, derive
 - **NTDS Database Path**: C:\Windows\NTDS
 - **Log Files Path**: C:\Windows\NTDS
 - **SYSVOL Path**: C:\Windows\SYSVOL
+  
+  #### Reverse DNS Lookup Configuration
+
+  Below is an illustration of Reverse DNS lookup configuration.
+<video controls src="files/videos/2Configuringdnsreverselookup(4).mp4" title="DNS Reverse Lookup Setup"></video>
 
 ### 3. **Creating and Managing Users and Groups**
 
@@ -524,6 +531,9 @@ This script, named `vulnad.ps1`, is designed to create a vulnerable AD environme
 - `UsersLimit 100`: This parameter sets the number of fake user accounts to be created.
 - `DomainName "biira.com"`: This specifies the domain name for the vulnerable AD environment.
 
+##### Video Illustration of Introduction of Vulnerability
+
+<video controls src="files/videos/3Runningvulnearblescript(1).mp4" title="Running Script to Introduce Vulnearability"></video>
 The script likely implemented several types of misconfigurations commonly found in real-world Active Directory environments, such as:
 
 1. Weak Password Policies
@@ -577,9 +587,6 @@ To complete the AD setup and integrate a client machine into the domain, a Windo
 After joining the domain, the Windows 10 client was able to authenticate against the domain controller, and domain resources were accessible based on the user’s permissions.
 
 ## Security Testing and Vulnerability Simulation
-
-
-
 
 ========================================================================================================================
 
@@ -710,9 +717,6 @@ In the Bridges tab, I will then forward all traffic from the LAN port to the SPA
 ![Lan to Span](files/images/016LantoSpan.png)
 ![BridgedLanTOSPan](files/images/017DoneBridge.png)
 
-
-
-
 ## Installing Windows Server 2022
 
 The windows server 2022 was installed successfuly and placed on Vmet2 which is serving as the internal network as depicted below
@@ -751,8 +755,6 @@ After the installaiont i promoted teh server to be a domain controller and then 
 ![Setting Root Domain Name](files/images/049SettingRootDomainName.png)
 The domain and forest functional levels were set to 2016 for backwak compatibility asn thent the DSRM password set accordingly. it then set the NetBios name as BIIRA which was good. The NTDS and SYSVOL file were kept in the default folders. Below is the script generated which can later be used to do AD promotion to domain controller
 
-
-
 ``` powershell
 Invoke-VulnAD -UsersLimit 100 -DomainName "biira.com"
 ```
@@ -764,7 +766,6 @@ With the installed script, teh following attakcs can now be executed on the Acti
 Abusing ACLs/ACEs
 Kerberoasting
 AS-REP Roasting
-
 
 ## Installing Splunk in Ububntu Server
 
@@ -905,4 +906,3 @@ disabled = 0
 disabled = 0
 
 ````
-
