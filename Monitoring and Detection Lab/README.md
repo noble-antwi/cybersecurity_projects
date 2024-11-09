@@ -182,6 +182,8 @@ In a lab environment, it is often necessary to configure firewall rules that all
 
 A Windows 10 virtual machine (VM) was installed and connected to VMNet2, which represents the internal LAN segment managed by the pfSense router. This setup serves to validate the network configuration and simulate a typical client environment within the lab.
 
+![Windows10Installed](files/images/001Win10Installed.png)
+
 #### Network Configuration and IP Assignment
 
 - **DHCP Assignment:** The Windows 10 VM successfully received an IP address of 192.168.1.10 from the DHCP server configured on the pfSense LAN interface (em1). This automatic IP assignment confirms that the pfSense DHCP service is functioning as expected and properly managing the 192.168.1.x subnet.
@@ -592,7 +594,7 @@ After joining the domain, the Windows 10 client was able to authenticate against
 
 1. VMware
 2. Windows 10
-![Windows10Installed](files/images/001Win10Installed.png)
+
 
 1. Installations of pfSense
    Per the topology above, the pfsesne will have 6 interfaces which is idicate below.
