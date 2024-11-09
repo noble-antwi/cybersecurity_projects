@@ -493,24 +493,6 @@ Additionally, the NetBIOS domain name was automatically set to **BIIRA**, derive
 - **Log Files Path**: C:\Windows\NTDS
 - **SYSVOL Path**: C:\Windows\SYSVOL
 
-A PowerShell script was generated to facilitate the process for future use or automated deployments:
-
-```powershell
-Import-Module ADDSDeployment
-Install-ADDSForest `
--CreateDnsDelegation:$false `
--DatabasePath "C:\Windows\NTDS" `
--DomainMode "WinThreshold" `
--DomainName "biira.com" `
--DomainNetbiosName "BIIRA" `
--ForestMode "WinThreshold" `
--InstallDns:$true `
--LogPath "C:\Windows\NTDS" `
--NoRebootOnCompletion:$false `
--SysvolPath "C:\Windows\SYSVOL" `
--Force:$true
-```
-
 ### 3. **Creating and Managing Users and Groups**
 
 Once the server was successfully promoted to a domain controller, an Organizational Unit (OU) named **CyberMonitoringLab** was created within Active Directory to organize domain objects for lab-specific configurations and testing. Under this OU, groups and users were created to simulate a typical organizational structure, providing a realistic environment for testing.
@@ -570,7 +552,7 @@ The vulnerabilities introduced by the script open up several potential attack ve
 
 This vulnerable Active Directory environment provides a rich testing ground for various attack scenarios and defensive strategies. It allows cybersecurity professionals to practice identifying and exploiting common AD misconfigurations, develop and test detection mechanisms for AD-based attacks, improve incident response procedures for AD compromise scenarios, and understand the impact of poor AD hygiene on overall network security.
 
-### 4. **Joining a Windows 10 Client to the Domain**
+### Joining a Windows 10 Client to the Domain
 
 To complete the AD setup and integrate a client machine into the domain, a Windows 10 system was configured to join the **biira.com** domain. The steps for domain joining are outlined below:
 
@@ -758,46 +740,7 @@ After the installaiont i promoted teh server to be a domain controller and then 
 ![Setting Root Domain Name](files/images/049SettingRootDomainName.png)
 The domain and forest functional levels were set to 2016 for backwak compatibility asn thent the DSRM password set accordingly. it then set the NetBios name as BIIRA which was good. The NTDS and SYSVOL file were kept in the default folders. Below is the script generated which can later be used to do AD promotion to domain controller
 
-```powershell
-#
-# Windows PowerShell script for AD DS Deployment
-#
 
-Import-Module ADDSDeployment
-Install-ADDSForest `
--CreateDnsDelegation:$false `
--DatabasePath "C:\Windows\NTDS" `
--DomainMode "WinThreshold" `
--DomainName "biira.com" `
--DomainNetbiosName "BIIRA" `
--ForestMode "WinThreshold" `
--InstallDns:$true `
--LogPath "C:\Windows\NTDS" `
--NoRebootOnCompletion:$false `
--SysvolPath "C:\Windows\SYSVOL" `
--Force:$true
-````
-
-I encounted a failur on my first trail due to the fact that i do not have alocal admin passowrd set on the server and hence had to fix that.
-![Failed Attempt](files/images/050FailedAttempt.png)
-The installation was able to proceed successfuly as the password issue was fixed.
-![Fixed Problem with Psswrod](files/images/051FixedProblem.png)
-![Installation Completed](files/images/052ServerUpRUnnning.png)
-
-After the isntallation, I created an organisational Unit (OU) called ```CyberMonitoringLab``` with groups and then users which were later added to the group Below is a Video demonstration of part of the activity.
-After teh step above, I need to make the active Directory Vulneabrle in order to expose it to many attakcs.
-The first thig i did was to doanload a script from a githunb repo that will be run to make the AD vulnearle
-Source to the Vulneable Script on gihub is <https://github.com/safebuffer/vulnerable-AD>
-The command below helpe dto download the script called vulnad.pas1
-
-``` powershell
-IEX((new-object net.webclient).downloadstring("https://raw.githubusercontent.com/wazehell/vulnerable-AD/master/vulnad.ps1"));
-
-```
-
-The script was then invoked to run withteh commnand below.
-
-```
 
 ``` powershell
 Invoke-VulnAD -UsersLimit 100 -DomainName "biira.com"
@@ -810,32 +753,7 @@ With the installed script, teh following attakcs can now be executed on the Acti
 Abusing ACLs/ACEs
 Kerberoasting
 AS-REP Roasting
-Abuse DnsAdmins
-Password in Object Description
-User Objects With Default password (Changeme123!)
-Password Spraying
-DCSync
-Silver Ticket
-Golden Ticket
-Pass-the-Hash
-Pass-the-Ticket
-SMB Signing Disabled
-![VUlnerable AD](files/images/054VuleAD.png)
 
-## Joining Windows10 to Domain
-
-In order to accomplish this, I first change the DNS configuration on the host machine so teh Preffered DNS Server will the IP address of the windpos Server whils the LAternate will be that from google, 8.8.8.8
-![DNS](files/images/055SettingDNSforHost.png)
-In the systems properties of the Host machine,  changed the name to pc1 and then restarted the machine first before tying to join the domain controller.
-
-I then changed from work grup to doamin and then inout the domain name as biira.com. I then joined the Administrator first to the domain by inptuing the username and its coreresponding passowrd.
-
-![Admi Joined](files/images/057Joined.png)
-
-In Active DOrectory, it has shown pc1 joined the domain succesfuly.This is located in teh Compputer Group under the domain.
-
-![pc1Joined](files/images/058pc1Joined.png)
-I later loggedn in to the windows machine with anotehr user created earlier in Active Directoty
 
 ## Installing Splunk in Ububntu Server
 
@@ -976,16 +894,6 @@ disabled = 0
 disabled = 0
 
 ````
-
-I have an explicit video on the set up below.
-
-===================================================================================================
-
-[Link to the Architectural Diagram](https://drive.google.com/file/d/1L2Ri70p85bDrAMxXZyRc9m__X1sVpACT/view?usp=sharing)
-
-### Comprehensive Home Lab Setup for Cybersecurity Testing and Monitoring
-
----
 
 ### Network Design and Segmentation
 
