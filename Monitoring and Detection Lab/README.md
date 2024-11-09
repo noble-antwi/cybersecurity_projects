@@ -23,16 +23,41 @@ The cybersecurity home lab is designed with a segmented network architecture to 
 
 ### Network Design and Segmentation
 
-The lab is divided into six distinct network segments, each serving a specific purpose:
+#### 1. **Security Operations Network** (**Monitoring/Defense Network**)
 
-1. **External Network (WAN)**: Simulates internet connectivity.
-2. **Internal LAN**: Represents a typical corporate network.
-3. **SPAN Port**: Used for network traffic mirroring and analysis.
-4. **Attacker Network**: Isolated segment for offensive security tools.
-5. **Security Onion Network**: Dedicated to log collection and analysis.
-6. **Splunk Network**: Separate segment for the Splunk log collector.
+- **IP Range**: `192.168.3.0/24`
+- **Description**: This network is designated for Security Onion and other related defense tools such as Intrusion Detection Systems (IDS), Intrusion Prevention Systems (IPS), and log aggregation services. It will act as the nerve center for monitoring traffic, analyzing logs, and correlating events across the labs networks.
 
-### IP Schema and Subnet Allocation
+#### 2. **Victim Network** (**Corporate Network/Target Network**)
+
+- **IP Range**: `192.168.1.0/24`
+- **Description**: This network represents the internal, corporate-like environment that is simulated for victim systems. It will be the target of attacks launched from the Attacker Network. The key focus here is creating a realistic corporate domain structure with systems such as Domain Controllers, workstations, and potentially other internal services (e.g., file servers, web servers).
+- **Components**:
+  - **Domain Controller**: (`192.168.1.1`) This acts as the Active Directory (AD) server, controlling user access, group policies, and authentication within the victim environment.
+  - **Windows Workstation 1**: (`192.168.1.X`) A standard user machine that attackers might exploit using lateral movement, phishing campaigns, or malware.
+    - **Potential Expansion**: Additional systems (Linux servers, database servers, etc.) can be added as needed to increase the scope of attack simulations.
+
+#### 3. **Monitoring Network** (**Log Aggregation Network**)
+
+- **IP Range**: `192.168.5.0/24`
+- **Description**: This network contains the key log aggregation and monitoring systems, including Splunk. The purpose is to collect logs from all systems across the lab (Security Onion, victim systems, etc.) and provide a central point for analyzing logs, monitoring events, and correlating them to potential attacks.
+- **Components**:
+  - **Splunk**: (`192.168.5.1`) A powerful platform for searching, monitoring, and analyzing machine-generated data from across the network.
+  - **Grafana** (future potential): A real-time analytics tool that provides visualizations of network performance, security events, and system health data, pulling from sources like Splunk or other log collectors.
+ 
+#### 4. **Attacker Network** (**Penetration Testing/Threat Actor Network**)
+
+- **IP Range**: `192.168.3.0/24`
+- **Description**: This network is designed to simulate external attackers attempting to breach the victim environment. It is isolated from the other networks but connected via pfSense, which will handle routing and segmentation. The purpose here is to allow the launch of attacks from the attacker environment to the corporate network.
+- **Components**:
+  - **Kali Linux**: (`192.168.3.X`) The attacker machine used to perform penetration testing, exploit vulnerabilities, and simulate real-world attacks. This machine will utilize tools like Metasploit, Nmap, and others to compromise the victim systems.
+
+#### 5. **pfSense Firewall and Routing**
+
+- **IP Range**: ` 192.168.4.0/24`
+- **Description**: Each network segment will be routed through **pfSense**, which serves as the core firewall and router, ensuring traffic flows securely between networks.
+
+- **Traffic Segregation**: Ensure all networks (Attacker, Victim, Monitoring) are properly isolated using pfSense to avoid unauthorized access between segments.
 
 The following table outlines the IP schema and subnet allocation for each network segment:
 
@@ -57,20 +82,6 @@ PfSense serves as the central router and firewall, managing traffic between netw
 | Attacker (em3) | 192.168.3.254 | Yes | 192.168.3.10 - 192.168.3.253 |
 | Security Onion (em4) | 192.168.4.254 | Yes | 192.168.4.10 - 192.168.4.253 |
 | Splunk (em5) | 192.168.5.254 | Yes | 192.168.5.10 - 192.168.5.253 |
-
-### Key Components and Their Network Placement
-
-1. **PfSense**: Central router and firewall, connected to all network segments.
-2. **Windows 10 Workstation**: Placed in the Internal LAN (192.168.1.X).
-3. **Kali Linux**: Located in the Attacker network (192.168.3.10).
-4. **Metasploitable**: Vulnerable system placed in the Internal LAN (192.168.1.X).
-5. **Windows Server 2022 (Domain Controller)**: Assigned a static IP in the Internal LAN (192.168.1.1).
-6. **Security Onion**: Management interface on External network (192.168.114.5), with additional interfaces for traffic capture and log collection.
-7. **Splunk**: Placed in its dedicated network for log analysis (192.168.5.0/24).
-
-This network architecture provides a robust environment for simulating various cybersecurity scenarios, from attack simulations to defensive monitoring and log analysis. The segmentation allows for isolated testing while maintaining the ability to monitor traffic across different network zones.
-
-Based on the information provided in your README file, I'll provide a detailed and professional explanation of the infrastructure setup for your cybersecurity home lab, focusing on VMware installation, pfSense configuration, and Windows 10 installation.
 
 ## Infrastructure Setup
 
@@ -895,87 +906,3 @@ disabled = 0
 
 ````
 
-### Network Design and Segmentation
-
-#### 1. **Security Operations Network** (Better name: **Monitoring/Defense Network**)
-
-- **IP Range**: `192.168.3.0/24`
-- **Description**: This network is designated for Security Onion and other related defense tools such as Intrusion Detection Systems (IDS), Intrusion Prevention Systems (IPS), and log aggregation services. It will act as the nerve center for monitoring traffic, analyzing logs, and correlating events across the labs networks.
-  
-- **Components**:
-  - **Security Onion**: (`192.168.3.10`) A platform for monitoring, detecting, and responding to cybersecurity threats. This instance will capture logs, analyze network traffic, and provide visibility into attack vectors.
-  - **Additional monitoring tools**: Other tools like Grafana, Kibana, and ELK Stack can be deployed in the future to provide advanced visualization and data correlation.
-
-#### 2. **Victim Network** (Better name: **Corporate Network/Target Network**)
-
-- **IP Range**: `192.168.2.0/24`
-- **Description**: This network represents the internal, corporate-like environment that is simulated for victim systems. It will be the target of attacks launched from the Attacker Network. The key focus here is creating a realistic corporate domain structure with systems such as Domain Controllers, workstations, and potentially other internal services (e.g., file servers, web servers).
-- **Components**:
-  - **Domain Controller**: (`192.168.2.10`) This acts as the Active Directory (AD) server, controlling user access, group policies, and authentication within the victim environment.
-  - **Windows Workstation 1**: (`192.168.2.11`) A standard user machine that attackers might exploit using lateral movement, phishing campaigns, or malware.
-  - **Windows Workstation 2**: (`192.168.2.12`) A second machine simulating another user endpoint, used for expanding the environment and testing larger attack vectors.
-  - **Potential Expansion**: Additional systems (Linux servers, database servers, etc.) can be added as needed to increase the scope of attack simulations.
-
-#### 3. **Monitoring Network** (Better name: **Log Aggregation Network**)
-
-- **IP Range**: `192.168.4.0/24`
-- **Description**: This network contains the key log aggregation and monitoring systems, including Splunk. The purpose is to collect logs from all systems across the lab (Security Onion, victim systems, etc.) and provide a central point for analyzing logs, monitoring events, and correlating them to potential attacks.
-- **Components**:
-  - **Splunk**: (`192.168.4.10`) A powerful platform for searching, monitoring, and analyzing machine-generated data from across the network.
-  - **Grafana** (future potential): A real-time analytics tool that provides visualizations of network performance, security events, and system health data, pulling from sources like Splunk or other log collectors.
-  - **Scalability**: Other security monitoring solutions can be added to this segment to provide enhanced visibility or to test their integration with existing tools.
-
-#### 4. **Attacker Network** (Better name: **Penetration Testing/Threat Actor Network**)
-
-- **IP Range**: `192.168.1.0/24`
-- **Description**: This network is designed to simulate external attackers attempting to breach the victim environment. It is isolated from the other networks but connected via pfSense, which will handle routing and segmentation. The purpose here is to allow the launch of attacks from the attacker environment to the corporate network.
-- **Components**:
-  - **Kali Linux**: (`192.168.1.10`) The attacker machine used to perform penetration testing, exploit vulnerabilities, and simulate real-world attacks. This machine will utilize tools like Metasploit, Nmap, and others to compromise the victim systems.
-  - **Other Attack Tools** (optional): In the future, additional attack platforms (such as Parrot OS) can be added to introduce variability in the attack methods.
-
-### Network Design Details
-
-#### **pfSense Firewall and Routing**
-
-- **IP Range**: Each network segment will be routed through **pfSense**, which serves as the core firewall and router, ensuring traffic flows securely between networks.
-- **Firewall Rules**:
-  - **Victim Network**: Strict rules should be in place to prevent unnecessary traffic between the Victim and Attacker networks. For example, the Victim Network should only allow certain types of incoming traffic from the Monitoring Network (e.g., for log collection and analysis).
-  - **Attacker Network**: Traffic from the Attacker Network should be limited to predefined penetration testing scenarios.
-  - **Monitoring Network**: Traffic should be allowed freely from the Monitoring Network to all other networks, as this network will collect logs and monitor all activity.
-
-#### **Network Security Layers**
-
-- **Internal Traffic Monitoring**: Security Onion and Splunk will be set up to capture network packets from the different segments and analyze them for anomalies. You can use **port mirroring** on the victim network to allow Security Onion to detect and analyze potential threats.
-- **Traffic Segregation**: Ensure all networks (Attacker, Victim, Monitoring) are properly isolated using pfSense to avoid unauthorized access between segments.
-
-#### **Future Expansions**
-
-- **Additional Victim Machines**: You can expand the Victim Network with more workstations or servers, such as Linux servers, email servers, or web servers, to simulate a more complex environment.
-- **Advanced Attack Techniques**: Introduce more sophisticated attack tools or attackers in the future to simulate complex APT (Advanced Persistent Threat) attacks, ransomware infections, or phishing campaigns.
-- **Log Aggregation Expansion**: The Monitoring Network can include new tools as you grow your lab, such as **ELK stack** for advanced analytics or **Prometheus** for real-time monitoring.
-  
----
-
-### Example IP Addressing Scheme
-
-| **Device**                | **Role**                    | **Network**             | **IP Address**        |
-|---------------------------|-----------------------------|-------------------------|-----------------------|
-| Domain Controller          | Active Directory Server      | Victim Network           | 192.168.2.10           |
-| Windows Workstation 1      | User Endpoint                | Victim Network           | 192.168.2.11           |
-| Windows Workstation 2      | User Endpoint                | Victim Network           | 192.168.2.12           |
-| Kali Linux                 | Attacker Machine             | Attacker Network         | 192.168.1.10           |
-| Security Onion             | IDS/IPS and Monitoring       | Security Operations Net. | 192.168.3.10           |
-| Splunk                     | Log Aggregation              | Monitoring Network       | 192.168.4.10           |
-| pfSense                    | Firewall and Router          | All                      | 192.168.1.1, 192.168.2.1, 192.168.3.1, 192.168.4.1 |
-
----
-
-### Diagram Overview
-
-For visualization, the architecture can be illustrated with a network diagram that represents the four network segments (Attacker, Victim, Monitoring, and Security Operations). This will show how pfSense acts as the routing layer, connecting each segment while ensuring proper segmentation and security controls.
-
----
-
-### Conclusion
-
-This lab setup is ideal for simulating a variety of cybersecurity scenarios, including network intrusions, lateral movement, and monitoring of attack behavior. The use of pfSense for network segmentation ensures isolation, while tools like Security Onion and Splunk enable real-time analysis and monitoring. The lab is modular, allowing for future expansion in terms of both network devices and monitoring capabilities.
