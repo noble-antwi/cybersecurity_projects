@@ -384,6 +384,7 @@ To grant access to the web interface, I modified the firewall rules using the **
 sudo so-firewall includehost analyst 192.168.0.0/16
 sudo so-firewall apply
 ```
+
 ![Updated IP Rules](<files/images/039AfterAddingAllthe INterfaces.png>)
 *Updated IP Rules*
 
@@ -402,6 +403,7 @@ The initial configuration allowed a broad IP range (`192.168.0.0/16`) to facilit
   
 ![Initial Configuration Setup](files/images/040GraphicalINterfacesinSecOnionofAllIPs.png)
 *Initial Configuration Setup*
+
 - **Configuration Path**: The final firewall adjustments were made using the Security Onion GUI:
   - **Navigation**: `Administration > Configuration > Firewall > Hostgroup > Analyst`
   - **Hostgroup**: The access group was updated to include only the host IP of `192.168.114.1`.
@@ -473,7 +475,8 @@ Additionally, the NetBIOS domain name was automatically set to **BIIRA**, derive
 - **SYSVOL Path**: C:\Windows\SYSVOL
   
 ![SetupCompleted](files/images/052ServerUpRUnnning.png)
-  #### Reverse DNS Lookup Configuration
+
+#### Reverse DNS Lookup Configuration
 
   Below is an illustration of Reverse DNS lookup configuration.
 <video controls src="files/videos/2Configuringdnsreverselookup(4).mp4" title="DNS Reverse Lookup Setup"></video>
@@ -560,7 +563,6 @@ To complete the AD setup and integrate a client machine into the domain, the Win
    ![Joinedin AD](files/images/058pc1Joined.png).
 
 After joining the domain, the Windows 10 client was able to authenticate against the domain controller, and domain resources were accessible based on the user’s permissions.
-
 
 ### Installing and Configuring Splunk on Ubuntu Server
 
@@ -653,14 +655,32 @@ The first test i carried out was to run an ICMP request on metasploitable 2. Thi
 
 <video controls src="files/videos/Running Nmap Scans.mp4" title="Runnig Scans"></video>
 
-**Note:** Earlier in the lab, I mentioned that some recordings were lost and could not be retrieved. However, I was later able to recover these recordings, and they are now included below for reference.
-
-
 ### Runnung a Nessus Scan
+
 Below a video demonstration of a nessus scan to view its capture in SecurityOnion
 <video controls src="files/videos/Running Nessus Scan.mp4" title="Running Nessus Scans"></video>
 
 ### New Relic Integration
+
 I used New Relic One agents on some hosts in teh lab setup to monitor perfromances. Watch video for a sneakpeak into the visuals
 
-<video controls src="files/videos/New Relic Integration.mp4" title="NewRelic One Integratoin"></video>s
+<video controls src="files/videos/New Relic Integration.mp4" title="NewRelic One Integratoin"></video>
+
+
+## Conclusion
+
+Completing this cybersecurity lab has been an enriching experience, offering deep insights into the complexities of network security, system hardening, and active threat detection. Through the implementation of tools like pfSense, Splunk, Security Onion, and Active Directory, I have gained a solid foundation in building, configuring, and maintaining secure environments that mimic real-world scenarios.
+
+Looking ahead, this lab serves as a springboard for further projects aimed at enhancing my cybersecurity expertise. One major area of expansion will be connecting the existing Active Directory to Microsoft Entra ID using Entra ID Connect. This integration will enable testing of identity synchronization, conditional access policies, and multifactor authentication, bridging on-premises infrastructure with cloud identity solutions.
+
+### Future plans include developing projects that involve:
+
+**Automated Incident Response:** Implementing scripts and processes that detect and respond to threats in real-time.
+
+**Threat Hunting:** Proactively searching for indicators of compromise using advanced analysis and data from monitoring tools.
+
+**Red vs. Blue Team Scenarios:** Conducting simulated attack and defense exercises to bolster both offensive and defensive strategies.
+
+**Cloud Security Practices:** Testing identity-based security measures and refining access management using Azure AD capabilities.
+
+This project marks the beginning of a continuous journey. By building on this setup, I will be able to adapt to the evolving threat landscape, integrate new tools and techniques, and further develop my proficiency in cybersecurity. The lab will remain a pivotal learning environment, fostering skill growth and readiness to tackle complex security challenges as they emerge.
