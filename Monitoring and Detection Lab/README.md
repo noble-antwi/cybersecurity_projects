@@ -479,7 +479,9 @@ Additionally, the NetBIOS domain name was automatically set to **BIIRA**, derive
 #### Reverse DNS Lookup Configuration
 
   Below is an illustration of Reverse DNS lookup configuration.
-<video controls src="files/videos/2Configuringdnsreverselookup(4).mp4" title="DNS Reverse Lookup Setup"></video>
+
+[![Reverse DNS Lookup Configuration](/cybersecurity_projects/Monitoring%20and%20Detection%20Lab/files/images/057Joined.png)](https://youtu.be/WZGN-nq9dQ4?si=QHBk_NpeqxGkfKez)
+
 
 #### 3. **Creating and Managing Users and Groups**
 
