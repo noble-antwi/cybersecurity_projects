@@ -592,29 +592,11 @@ After joining the domain, the Windows 10 client was able to authenticate against
 
 ========================================================================================================================
 
-1. VMware
-2. Windows 10
 
-
-1. Installations of pfSense
-   Per the topology above, the pfsesne will have 6 interfaces which is idicate below.
-   The configuration is.
-
-| Network Adapter   | VMNet   |
-|-------------------|---------|
-| Network Adapter   | NAT     |
-| Network Adapter 2 | VMNet2  |
-| Network Adapter 3 | VMNet3  |
-| Network Adapter 4 | VMNet4  |
-| Network Adapter 5 | VMNet5  |
-| Network Adapter 6 | VMNet6  |
 
 ![VnetConfiguration of pfsense](files/images/002pfSenseVmNetConfiguration.png)
 
-During the installation process, the first interface to show up in order to configure the rest of the interfaces indicated no IP address configuration for WAN (wan) with interface em0.
-Further research on my side showed that the WMware NAT servies running ont he host was stoped hence the insatance was not getting the WAN interface IP address which is the IP.
-address it will use to access the internet.  A restart of the Service in services resolves th issue.
-In th intial IP assigment. th Wan insterface has an IP ADDRESS OF 192.1868.114.10/24  WHICH IS THE FIRST ip i CONFIGURED IN vmware fOR nat TO ASSIGNT O THE FURST INSTANCE IN THE NETWORK..The configuration can be seen below.
+
 
 ![NATSetup](files/images/005NATSetup.png)
 
@@ -622,7 +604,7 @@ In th intial IP assigment. th Wan insterface has an IP ADDRESS OF 192.1868.114.1
 
 ![pfSenseConfiguration](files/images/004InitialIPconfigurationofPfSense.png)
 
-This version aligns the content properly for a clean and readable table in Markdown.
+
 
 ### Configuration of pfSense Interfaces
 
@@ -710,6 +692,7 @@ Here’s a table in Markdown format with the headers "Old Name" and "New Name" a
 | OPT2 (em3)     | Kali           |
 | OPT4 (em5)     | SecOnion       |
 | OPT5 (em6)     | splunk         |
+
 ![New Names](files/images/015NewNames.png)
 
 #### COnfiguring Span
@@ -718,60 +701,6 @@ In the Bridges tab, I will then forward all traffic from the LAN port to the SPA
 
 ![Lan to Span](files/images/016LantoSpan.png)
 ![BridgedLanTOSPan](files/images/017DoneBridge.png)
-
-## Installing Windows Server 2022
-
-The windows server 2022 was installed successfuly and placed on Vmet2 which is serving as the internal network as depicted below
-
-| IP Subnet       | Network Connection | Role   | PfSense Interface | VMware Adapter  |
-|-----------------|--------------------|--------|-------------------|-----------------|
-| 192.168.114.0/24 | NAT                | WAN    | em0               | Network Adapter |
-| 192.168.1.0/24   | VMNet2             | LAN    | em1               | Network Adapter 2 |
-| No IP Address    | VMNet3             | SPAN   | em2               | Network Adapter 3 |
-| 192.168.3.0/24   | VMNet4             | KALI   | em3               | Network Adapter 4 |
-| 192.168.4.0/24   | VMNet5             | SECONION | em4              | Network Adapter 5 |
-| 192.168.5.0/24   | VMNet6             | SPLUNK | em5               | Network Adapter 6 |
-
-![WinServer](files/images/045WinServerInstalled.png)
-From the IP configuration layout below, teh Server would have obtained its IP addess from pfSense that had already been configured as the DCH server.
-
-| pfSencse Interface | IP Address|DHCP Enabled? | Range of DHCP IP |
-|----------- | ----------| -----------|-------------------|
-|WAN (em0) | 192.168.114.10 (auto assigned)| Acquired From host | Will Revert|
-|LAN (em1) | 192.168.1.254 | Yes | 192.168.1.10 to 192.168.1.253|
-|OPT1 (em2)    | No IP Address configured (used as a Span Port)| Not Required Since it is a Span Port   | Not Required|
-|OPT2 (em3) | 192.168.3.254 | Yes | 192.168.3.10 to 192.168.3.253|
-|OPT3 (em4) | 192.168.4.254 | Yes | 192.168.4.10 to 192.168.4.253|
-|OPT4 (em5) | 192.168.5.254 | Yes | 192.168.5.10 to 192.168.5.253|
-
-It is however imperative to note that a server obtaining its IP address from DCHP  not be wise to do as other clients will be depending on the server for services.
-From the range above, teh reserved IP range for VMnet2 whuch the server recides in is from ```192.168.1.1 to 192.168.1.9```.
-I will therofre assign a static IP of ```192.168.1.1``` and set the Gateway as the IP of the pfSense and and set the DNS as the server IP with the seconday been that of ```8.8.8.8```
-![DNSSetup](files/images/046DNSSetUp.png). The firewall was tunred off and the security also tunred off in order to simulate the attack laer in the project.
-The server name was also changed to srv1 and then rebooted for the changes to take effect
-
-I started to add the Active DIrecotry to the Server in order to maek it the Domain Cocntroller.
-![Installing AD](files/images/048ActiveDirectoryDomainServicesBeenAdded.png)
-
-After the installaiont i promoted teh server to be a domain controller and then set the Root Domain Name as ```biira.com```
-![Setting Root Domain Name](files/images/049SettingRootDomainName.png)
-The domain and forest functional levels were set to 2016 for backwak compatibility asn thent the DSRM password set accordingly. it then set the NetBios name as BIIRA which was good. The NTDS and SYSVOL file were kept in the default folders. Below is the script generated which can later be used to do AD promotion to domain controller
-
-``` powershell
-Invoke-VulnAD -UsersLimit 100 -DomainName "biira.com"
-```
-
-![Fake Accounts](files/images/052ServerUpRUnnning.png)
-The scripts created lots of users that i did not create first and more details of the script will eb explaine dlater.
-
-With the installed script, teh following attakcs can now be executed on the Active DIrectroy:
-Abusing ACLs/ACEs
-Kerberoasting
-AS-REP Roasting
-
-## Installing Splunk in Ububntu Server
-
-I then need to install Splunk on my system by using the short ubuntu command below
 
 ``` bash
 wget -O splunk-9.3.1-0b8d769cb912-linux-2.6-amd64.deb "https://download.splunk.com/products/splunk/releases/9.3.1/linux/splunk-9.3.1-0b8d769cb912-linux-2.6-amd64.deb"
