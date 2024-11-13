@@ -658,13 +658,18 @@ The first test i carried out was to run an ICMP request on metasploitable 2. Thi
 ### Runnung a Nessus Scan
 
 Below a video demonstration of a nessus scan to view its capture in SecurityOnion
+
 <video controls src="files/videos/Running Nessus Scan.mp4" title="Running Nessus Scans"></video>
+
 
 ### New Relic Integration
 
 I used New Relic One agents on some hosts in teh lab setup to monitor perfromances. Watch video for a sneakpeak into the visuals
 
 <video controls src="files/videos/New Relic Integration.mp4" title="NewRelic One Integratoin"></video>
+
+[Watch New Relic Integration Video](files/videos/New%20Relic%20Integration.mp4)
+
 
 
 ## Conclusion
@@ -673,7 +678,7 @@ Completing this cybersecurity lab has been an enriching experience, offering dee
 
 Looking ahead, this lab serves as a springboard for further projects aimed at enhancing my cybersecurity expertise. One major area of expansion will be connecting the existing Active Directory to Microsoft Entra ID using Entra ID Connect. This integration will enable testing of identity synchronization, conditional access policies, and multifactor authentication, bridging on-premises infrastructure with cloud identity solutions.
 
-### Future plans include developing projects that involve:
+### Future plans include developing projects that involve
 
 **Automated Incident Response:** Implementing scripts and processes that detect and respond to threats in real-time.
 
