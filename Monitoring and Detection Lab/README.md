@@ -656,33 +656,11 @@ The first test i carried out was to run an ICMP request on metasploitable 2. Thi
 **Note:** Earlier in the lab, I mentioned that some recordings were lost and could not be retrieved. However, I was later able to recover these recordings, and they are now included below for reference.
 
 
-========================================================================================================================
+### Runnung a Nessus Scan
+Below a video demonstration of a nessus scan to view its capture in SecurityOnion
+<video controls src="files/videos/Running Nessus Scan.mp4" title="Running Nessus Scans"></video>
 
+### New Relic Integration
+I used New Relic One agents on some hosts in teh lab setup to monitor perfromances. Watch video for a sneakpeak into the visuals
 
-```
-
-![Static IP](files/images/063StaticIPconfiguration.png)
-
-## Configruation on Splunk to Receive Logs and also Indexing for Windows Server
-
-In the video below i use teh opportnity to set up a splunk receining end on port 9997 and alse set up a node(more like a buket) called index to hold the logs that will come from WIndows Server. The name given to the index is  ```windowServerLogs```
-
-## Setting Up Forwarder on Windows Server
-
-In the next step, i need to set up forwarder on the host which is the Domain controller to forward its logs to Splunk for analysYS.
-I complterd the downlload of Splunk Enterprise 9.3.1 for Windows on the we website of splnk using the URL <https://www.splunk.com/en_us/download/universal-forwarder.html#>  After the download has comeplted i copied it to the DOmain COntroller and installed it
-
- In aconfigured the inout.conf file in order for Splunk to see that data using the content
-
- ``` powershell
-
- [WinEventLog://Application]
-disabled = 0
-
-[WinEventLog://Security]
-disabled = 0
-
-[WinEventLog://System]
-disabled = 0
-
-````
+<video controls src="files/videos/New Relic Integration.mp4" title="NewRelic One Integratoin"></video>s
