@@ -270,7 +270,9 @@ More like the last agent to hold the email for the receiver to retrive it.
 8. X-headerer IP ot X-origninating IP: INdicates the IP of the email provider it coming from.If this is not present then you can check the received hearders section
 9. Received: There are mutiple of them which ondicates hte ralye of MTA hwich is the number of email servers that the email traverse.The received orderes are in reverese chronilogial order.
 
-Parsin =g email headers can also be done in an easy way by using the platform <https://mha.azurewebsites.net/> and <https://mxtoolbox.com/EmailHeaders.aspx>
+Parsing email headers can also be done in an easy way by using the platform <https://mha.azurewebsites.net/> and <https://mxtoolbox.com/EmailHeaders.aspx>
+
+### Email Authentication Methods
 
 ## SKILLS
 
