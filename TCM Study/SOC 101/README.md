@@ -267,12 +267,43 @@ More like the last agent to hold the email for the receiver to retrive it.
 5. To: Indicates the recipient Email Address
 6. Reply to: Indicates the email address to whcih the replies go to in the even the user want to send a reply.
 7. Return Path: also known as the envelope, or bounce address: This indicates where failed email address shpuld be sent i.e if there is a failure in sending a mail then it should be sent to the specified email address.
-8. X-headerer IP ot X-origninating IP: INdicates the IP of the email provider it coming from.If this is not present then you can check the received hearders section
+8. X-headerer IP ot X-origninating IP: Indicates the IP of the email provider it coming from.If this is not present then you can check the received hearders section
 9. Received: There are mutiple of them which ondicates hte ralye of MTA hwich is the number of email servers that the email traverse.The received orderes are in reverese chronilogial order.
 
 Parsing email headers can also be done in an easy way by using the platform <https://mha.azurewebsites.net/> and <https://mxtoolbox.com/EmailHeaders.aspx>
 
-### Email Authentication Methods
+### Email Authentication Headers
+there are 3 major Email authentication headers out there namely
+
+1. SPF (Sender Policy Framework)
+2. DKIM (Domain Keys Identified Mail) and
+3. DMARC (Domain Based Authentication, Reporting and Conformance)
+These protocols can be used to check if a domain actually send and email or it has been spoofed.
+
+#### SPF (Sender Policy Framework)
+
+ Domain owners use this policy to specify which domains are authorised to send email on thier behalf/. Works by publishing SPF records in DNS. SPF record can be checked for any domain by using the `dig` command or `nslookup` ![spf](image-3.png) or by using dig
+ ![alt text](image-4.png)
+ The v states the version which in this case is verison 1 and will the same in most cases. The IP address shown are the ones allowed to send email address.
+ The `_include`where google is stated also shows that google is allowed to send email on behalf of shodan. The `-all` (hard fail) means that emails from any other unauthorised senders should be rejected. Another option you will see often is the `~all` (knows as the soft fail) which indicates that the server should accept mails from IPs not explicitely listed in the SPF recored but should treat them with suspicion.
+
+#### DKIM (Domain Keys Identified Mail)
+
+Used to authenticate the origin or email messages. Its primary purpose is to allow a receiver that an email msg is indded from the email server and does this with PKI
+
+#### DMARC (Domain Based Authentication, Reporting and Conformance)
+
+Works alongside SPF and DKIM to enhance the overall email authentication with additional reporting mechanism
+
+## Encoding
+
+1. HTML Entity encoding
+2. Qouted printable encoding
+3. URL Encoding
+4. base64 encoding
+
+## Anatomy of a URL
+![URL](image-5.png)
 
 ## SKILLS
 
