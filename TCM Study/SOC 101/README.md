@@ -258,7 +258,7 @@ More like the last agent to hold the email for the receiver to retrive it.
    2. take proactive defense actions
 8. Documentationa dn reporting.
 
-### Email Headers.
+### Email Headers
 
 1. Date: SPecifies the date the message was composed or sent
 2. From: Sender details: this can be spoofed.
@@ -273,6 +273,7 @@ More like the last agent to hold the email for the receiver to retrive it.
 Parsing email headers can also be done in an easy way by using the platform <https://mha.azurewebsites.net/> and <https://mxtoolbox.com/EmailHeaders.aspx>
 
 ### Email Authentication Headers
+
 there are 3 major Email authentication headers out there namely
 
 1. SPF (Sender Policy Framework)
@@ -303,9 +304,106 @@ Works alongside SPF and DKIM to enhance the overall email authentication with ad
 4. base64 encoding
 
 ## Anatomy of a URL
+
 ![URL](image-5.png)
+
+## URL Analysis
+
+The first step for URL analysis is to extrat the URL.
+Using Cybershef..
+
+1. open URL as meial attachment
+2. decode using things like
+   1. qouted printable
+   2. url decoding
+   3. base 64 endoding
+   4. ![alt text](image-6.png)
+3. Extract URLS: after the decoding has been done, we use the url extraction from cybershef to fetch out all urls present in the file.
+   1. ![alt text](image-7.png)
+4. The next step will be to Defang the urls: meaning it will no longer be clickable hyperlink i.e we want to prevent them from been turn into an automatic link
+   1. ![alt text](image-8.png)
+5. Another way is to use the script in extracting all the file details. [Click her for the script](https://raw.githubusercontent.com/MalwareCube/Email-IOC-Extractor/refs/heads/main/eioc.py). The script will have to be run with python3
+   1. ![alt text](image-9.png)
+
+Phishtang is a webpage where people can report malicous urls for community review and categorization.`https://phishtank.org/`
+
+Another tool is the use of `https://www.url2png.com/`. This website will scan the urls pasted to give you a visual reprensetation of the site and you can make some deduction as to whether it is a genuine site or not.
+
+We can also make use of `https://urlscan.io/`.
+ Another option is to use Virus Totla wiht the url `https://www.virustotal.com/gui/home/upload`
+
+ URL Vooid is another one that can confirm the reputation of a url `https://www.urlvoid.com/`
+
+Wanabrowser can give u the content of the url browser: `<https://www.wannabrowser.net/>
+
+Short URL can be unshortend by Unshorten it : `https://unshorten.it/`. Wanabrowser can also be used to unshorten URLs
+
+URL Haus is a list of suspicious urls submitted by researchers `https://urlhaus.abuse.ch/`
+
+You can also use Google safe browing to check the status of a particular domain: `https://transparencyreport.google.com/safe-browsing/search`
+
+Joe Sandbox can also be use to browse and detonate URLs.
+
+## Email Attachment
+
+Apaert from downloadin the attachment, there is another script from the DidierStevens suit that allows you to extract files from email all from the command line. Link to the file is `https://github.com/DidierStevens/DidierStevensSuite/blob/master/emldump.py`. Below is the demomstation of using command to extract attachement using the script
+![Extraction of Attachment](image-10.png)
+
+### Collecting FIle Hashes
+
+1. sha256sum <name of file>
+2. md5sum <name of file>
+3. sha1sum <name of file> or combine the three at a go using &&
+4. sha256sum <name of file> && md5sum <name of file> && sha1sum <name of file> 
+![File Hashes](image-11.png)
+
+The email extration script can also obtaint the hashes of any attached file.
+![File Hashes](image-12.png)
+
+After obtaining the hashes, we will need to use File Reputation databases to obtian more information about them. One very importanta service is the Virus Total: `https://www.virustotal.com/gui/home/upload`. It is advisable to use a fiel has rather than uploadind the file as a user withj enterprse access can access adn download those file.
+![VrusTotal](image-13.png)
+
+Another tool to use for File reputation check is the Cisco Talos. It is a threat intellifence and research organisation opearted by Cisco `https://talosintelligence.com/`
+![Talos File Reputation Search](image-14.png)
+
+It is very importan to always documentation of all finding during analysis and hence the need to use possibly screenshot as well during the process of investigation.
+
+### Dynamic Attachment Analysis and Sandboxing
+
+Sanboxing is a seuciry technique ise to isolating potentially harmfuk file from the rest of our system.
+ There are some things to look out for in a dynamic analysis
+
+ 1. Process activity: the processes that are coming up due to the file execution and thier parent child relationship
+ 2. Registry Changes
+ 3. Network connection: conenctions made when the files executes
+ 4. File Activity: Ading more files etc
+
+#### Malware analysis tolls
+
+1. Hybrid Analysis (`https://hybrid-analysis.com/`): Free malware analysis tool that can detect malware powered by crowdstrike falcon sandbox
+   ![alt text](image-15.png)
+   ![alt text](image-16.png)\
+2. Joe Sandbox
+3. Any run (`https://app.any.run/`)
+
+#### Static MalDoc Analysis
+
+Making use of the script from DidierStevens `https://github.com/DidierStevens/DidierStevensSuite/blob/master/oledump.py
+`
+![ole](image-17.png)
+The capital M shows there is an embded macro in the index of A4
+![Opening the File](image-18.png)
+Running the above will produce the hex dump of the raw macro as shown below:
+![Hex dump](image-19.png)
+To extrnas teh string we use the `-S` flag
+![strin extraction](image-20.png)
+
+In order to extract the ful vba script, we make use of the `--vbadecompresscorrupt`
+![fetching vba script](image-21.png)
+
 
 ## SKILLS
 
 1. Email Analysis.
 2. Phishing Analysis
+3. URL Analysis
