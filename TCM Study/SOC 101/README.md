@@ -396,14 +396,110 @@ The capital M shows there is an embded macro in the index of A4
 Running the above will produce the hex dump of the raw macro as shown below:
 ![Hex dump](image-19.png)
 To extrnas teh string we use the `-S` flag
-![strin extraction](image-20.png)
+![string extraction](image-20.png)
 
 In order to extract the ful vba script, we make use of the `--vbadecompresscorrupt`
 ![fetching vba script](image-21.png)
 
+
+Along with malicious word documents, another popular way to dsitribute malware is malicous pdfs. We will go  through some tools to dig and carve into pdfs. Most instances there include malicous urls in pdf files that users clicked to access those sites. the potential of evading email filteres.
+Use Didierstenves suits to parse and carve through pdfs. 
+
+[DidierStevensSuite
+pdf-parser.py](https://github.com/DidierStevens/DidierStevensSuite/blob/master/pdf-parser.py)
+
+
+![pdf parser](image-22.png)
+Use the pdf name as argument to the parser and piped t more command in order to scroll through one by one.
+![
+   it iwll carve through and get the any IOC like URL etc.
+](image-23.png)
+To searach a specific thing in the commnad, you use the -s flag as showun in the image below which is searching for URI
+![URI](image-24.png)
+
+
+we can also use the pdf id parser
+[pdfid.pytex](https://github.com/DidierStevens/DidierStevensSuite/blob/master/pdfid.py)
+
+![alt text](image-25.png)
+Key things to look out for are:
+1. jsavascript embedding
+2. JS
+3. open action: can cours the pdf reader to take action
+4. lunch objects
+5. emebdded files
+
+You cna then use the pdf parser to extract the embedded files
+![pdf parser](image-26.png)
+
+![alt text](image-27.png)
+
+For automatics tool make use of `PHISHTOOL`
+
+
+## REACTIVE PHISHING DEFENSE
+
+1. containment
+   1. Determine scope
+   2. quarantine
+   3. block sender artifacts
+   4. block web artifacts
+   5. block file artifacts. Lverage endpoint edr to block such files
+2. Eradication
+   1. remove malicous mails
+      1. content search and edsicovery
+   2. Remove malicous files
+   3. Abuse form submissions
+   4. credential changes
+   5. Reimaging
+3. Recovery
+   1. restore systems
+4. Communication
+   1. Notify affected users
+   2. update stakeholders
+5. user education
+
+## PROACTIVE PHISHING DEFENSE
+1. Email filtering
+   1. email secuirty appliance
+   2. marking external emails
+2. URL Scanning
+   1. real time url inspection
+   2. block recefntly registered domains
+3. Attachment filtering
+   1. file extension block
+   2. attachment sandboxing
+4. Email auhentication methodd
+   1. spf
+   2. dkim
+   3. dmarc
+5. User training
+
+### DOCUMENTATION
+
+
+### NETWORK LAYER PROTOCOLS
+
+1. IP(Internet Protocol). Falls in the network layer
+   1. IP Addressing
+   2. IP routing
+2. Tranmission COntrol Protol (TCP)
+   1. Operates at the Transport layer. Ensures reliable connection using sequence number. It is connection oriented protocol.
+   2. Uses flow control and congestion control.
+3. User Datagram Protocl(UDP)
+   1. Does not provide relibality or seqence number.
+
+#### IPv4 Header
+
+
+![IP Header](image-29.png)
 
 ## SKILLS
 
 1. Email Analysis.
 2. Phishing Analysis
 3. URL Analysis
+4. Intrusion detection
+5. Packet Analysis
+6. Detection Rules
+7. Network Monitoring
