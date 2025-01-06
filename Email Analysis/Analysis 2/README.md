@@ -23,7 +23,7 @@ On May 12, 2024, Emily Nguyen, a marketing team member at Global Logistics, repo
 The exact date and time when the email was delivered were extracted using two different methods to ensure accuracy:  
 
 - **Method 1: Didier Stevens’ `eioc.py` script**  
-  Didier Stevens’ Python script, `eioc.py`, was used to extract key metadata from the email file (`challenge2.eml`). This tool is commonly used for email analysis, providing a detailed breakdown of email headers, including delivery timestamps.  
+  Didier Stevens’ Python script, `eioc.py`, was used to extract key metadata from the email file  [challenge2.eml](File/Other/challenge2.eml). This tool is commonly used for email analysis, providing a detailed breakdown of email headers, including delivery timestamps.  
 
   - **Command Executed:**  
   
@@ -43,8 +43,10 @@ The exact date and time when the email was delivered were extracted using two di
 - **Method 2: Online Tool - MXToolbox**  
   To cross-verify the timestamp, the email was analyzed using [MXToolbox](https://mxtoolbox.com). This tool allows for a detailed inspection of email headers, including delivery timing.  
 
-  - **Output from MXToolbox:**  
-    ![MXToolbox Output](image.png)  
+- **Output from MXToolbox:**  
+  
+     
+    ![MXToolbox Output](File/Images/image-1.png)
 
   - **Explanation of Findings:**  
     MXToolbox corroborated the findings from `eioc.py`, confirming the delivery timestamp. The inclusion of multiple verification methods ensures the timestamp’s accuracy and reliability.  
@@ -60,7 +62,7 @@ Here is the expanded and professional version of each section:
 The subject line of an email is a critical indicator of its purpose and intent. In this case, the subject line was determined by analyzing the email header through two methods:  
 
 1. **Using Didier Stevens’ `eioc.py` Script:**  
-   The `eioc.py` script parses email metadata and displays essential information such as the subject line. Upon running the script on the provided email file (`challenge2.eml`), the output clearly displayed the subject as:  
+   The `eioc.py` script parses email metadata and displays essential information such as the subject line. Upon running the script on the provided email file [challenge2.eml](File/Other/challenge2.eml), the output clearly displayed the subject as:  
    **`Reset your Dropbox password`**  
 
 2. **Manual Header Analysis via Text Editors:**  
@@ -126,8 +128,7 @@ The Return-Path field in the email header indicates the address where undelivera
 
 3. **Analysis and Correlation:**  
    The Return-Path address uses a domain consistent with Dropbox's email services, which strengthens the case for the email being legitimate.  
-
-![Return Path](image-1.png)  
+![Return Path](File/Images/image-1.png)
 
 ---
 
@@ -151,10 +152,6 @@ The sender's IP address is a key factor in tracing the email’s origin. The res
 
 By correlating the IP address, hostname, and email content, the likelihood of this email being from a legitimate source increased significantly.
 
----
-Here’s the expanded version of the remaining sections of your analysis:
-
----
 
 ### **7. Autonomous System Number (ASN)**  
 
@@ -177,7 +174,7 @@ The Autonomous System Number (ASN) is a unique identifier assigned to an autonom
 3. **Analysis of ASN:**  
    The ASN `AS16509` is registered to Amazon Web Services (AWS), indicating that the email originated from an Amazon SES (Simple Email Service) server. This finding aligns with the legitimate infrastructure often used by Dropbox for sending emails.  
 
-   ![ASN Result](image-2.png)  
+   ![ASN Result](File/Images/image-2.png)
 
 ---
 
@@ -192,7 +189,7 @@ The Sender Policy Framework (SPF) check is a mechanism to validate the authentic
 2. **Significance of the SPF Check:**  
    A "Pass" result indicates that the email passed SPF validation, supporting the legitimacy of the sender’s domain and infrastructure. This finding is consistent with Dropbox's use of Amazon SES.  
 
-   ![SPF Check](image-8.png)  
+   ![SPF Check](File/Images/image-8.png)  
 
 ---
 
@@ -211,12 +208,12 @@ The SPF record for the sender's domain provides a list of IP addresses and mecha
    The output revealed the SPF record as:  
    **`v=spf1 include:amazonses.com ~all`**  
 
-   ![DNS Lookup](image-9.png)  
+   ![DNS Lookup](File/Images/image-9.png)
 
 2. **Cross-Verification via MXToolbox:**  
    MXToolbox confirmed the SPF record through its SPF lookup functionality.  
-
-   ![SPF Online Method](image-10.png)  
+  
+   ![SPF Online Method](File/Images/image-10.png)
 
 3. **Significance of Findings:**  
    The SPF record specifies that only Amazon SES servers are authorized to send emails for this domain. This strengthens the case for the email’s legitimacy.  
@@ -234,7 +231,7 @@ The Message ID is a unique identifier assigned to each email by the originating 
 2. **Manual Verification:**  
    A review of the email header in a text editor confirmed the same Message ID.  
 
-   ![Message ID](image-3.png)  
+   ![Message ID](File/Images/image-3.png) 
 
 3. **Analysis:**  
    The Message ID structure and domain align with Amazon SES’s email-sending standards, further validating the email's authenticity.  
@@ -251,8 +248,8 @@ The encoding type defines how the email body content is represented for transmis
 
 2. **Definition of Quoted-Printable Encoding:**  
    This encoding method is commonly used for email content, enabling non-ASCII characters to be encoded in a way that remains compatible with most email systems.  
-
-   ![Encoding Type](image-4.png)  
+ 
+   ![Encoding Type](File/Images/image-4.png)
 
 3. **Significance of Findings:**  
    The use of a standard encoding method like quoted-printable supports the legitimacy of the email's formatting and transmission.  
@@ -271,8 +268,8 @@ URLs in phishing emails often lead to malicious websites. Extracting and analyzi
 
 2. **Alternative Extraction via CyberChef:**  
    Using CyberChef, the URLs were extracted, defanged, and cross-verified. The results matched those obtained from Didier Stevens’ script.  
-
-   ![CyberChef URL Extraction](image-6.png)  
+  
+   ![CyberChef URL Extraction](File/Images/image-6.png)
 
 3. **Analysis of Base Domain:**  
    The base domain (`www.dropbox.com`) was verified as legitimate using Cisco Talos.  
@@ -287,7 +284,7 @@ The reputation of the domain sending the email or hosting links is a strong indi
    The base domain (`https://www.dropbox.com`) was analyzed using Cisco Talos’ reputation service. The domain was classified as:  
    **Reputation:** Favorable  
 
-   ![Domain Reputation](image-7.png)  
+   ![Domain Reputation](File/Images/image-7.png)
 
 2. **Significance of Findings:**  
    A favorable reputation for the domain suggests it is legitimate and unlikely to be associated with malicious activity.  
@@ -298,4 +295,4 @@ The reputation of the domain sending the email or hosting links is a strong indi
 
 Following a comprehensive analysis of the email headers, SPF records, Message ID, and domain reputation, it was concluded that the email is **legitimate**. Emily Nguyen can safely interact with the email and proceed with the password reset if required.  
 
---- 
+---
