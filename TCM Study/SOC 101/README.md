@@ -477,6 +477,11 @@ For automatics tool make use of `PHISHTOOL`
 
 ### DOCUMENTATION
 
+### MORE PRACTICE.
+For more practice check these resources out/;
+1.  [Github repo of phishing emails:](https://github.com/rf-peixoto/phishing_pot)
+2.  [Phishtang URLs](https://phishtank.org/)
+3.  [Mlware Database to donwload and test out your skill](https://bazaar.abuse.ch/)
 
 ### NETWORK LAYER PROTOCOLS
 
