@@ -52,6 +52,7 @@ Each analysis in this repository follows a structured approach:
 ## 🛠️ Tools Used
 
 ### Primary Analysis Tools
+
 - Didier Stevens' Email Analysis Suite
 - VirusTotal Intelligence
 - CyberChef
@@ -83,31 +84,12 @@ This repository also serves as an educational resource for:
 - Incident Responders
 - Digital Forensics Investigators
 
-## 🤝 Contributing
-
-We welcome contributions! Please follow these steps:
-1. Fork the repository
-2. Create a feature branch
-3. Submit a pull request with detailed description
-4. Ensure all sensitive data is sanitized
-
 ## ⚠️ Disclaimer
 
 - All email samples are sanitized and anonymized
 - Sensitive information has been removed
 - Malicious indicators are defanged
-- Use tools and techniques responsibly
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 📞 Contact
-
-For questions, suggestions, or contributions, please:
-- Open an issue in this repository
-- Submit a pull request
-- Contact the maintainer through GitHub
+- Use tools and techniques responsiblytHub
 
 ## 🏆 Acknowledgments
 

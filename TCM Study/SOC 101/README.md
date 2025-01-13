@@ -499,6 +499,97 @@ For more practice check these resources out/;
 
 ![IP Header](image-29.png)
 
+## Traffic Analsys
+
+### Packets
+Made up of three main parts
+1. Headers
+2. Payload
+3. Trailor
+
+### Packet Based Analysis
+
+#### Introduction to tcpdump
+
+You can set up automatic capture with scripts. Typically used with root user
+
+1. `sudo tcpdump -i lo` : capture on the loppback address
+2. Check interfaces using `ip link show`
+3. tcpdum -D : show all interfaces to capture.
+![dumo interfaces](image-30.png)
+4. sudo tcpdump -i <interface name > or <number>
+5. ![alt text](image-31.png)
+6. ![alt text](image-32.png)
+7. `sudo tcpdump -i lo -X `: The -X prints it in Hexadecimal and ASCII format.
+
+The messages is Uncripted
+![alt text](image-34.png)
+
+![alt text](image-33.png)
+8. `sudo tcpdump -i lo -A `: Tells TCPdump to just print out the ASCII data
+9. `sudo python3 -m http.server 80`: This sets up a web server on the system
+10. ![alt text](image-35.png)
+11. `sudo tcpdump -i ens33 ` This will give u the fulll DNS names
+![alt text](image-36.png)
+12. `sudo tcpdump -i ens33 -n` will remove the dns name
+![alt text](image-37.png)
+
+#### Capture FIlter
+`sudo tcpdump -i ens33 -n host example.com`: Helps to capture traffic regarding the specifi host.
+In the case above, it will only capure traffic from only example.com when you enter that as the url in a browser. This filer will become very important when you wnat to monitor trffaci from a known domain or a malicous site.
+![alt text](image-38.png)
+
+There is also the `source (src)` and the `destination (dst)` filsters that can be applied to tcpdump which allows to filter on specific senders and receivers of a traffic
+`sudo tcpdump -i ens33 -n src <>`:
+`sudo tcpdump -i ens33 -n dst <>`:
+
+We can also set to capture traffic to a specif subnet based on the range or CIDR notation.
+`sudo tcpdump -i ens33 -n net  192.168.1.1/24`:
+
+We can also append the dst or src to the net
+`sudo tcpdump -i ens33 -n  src net  192.168.1.1/24` : Source Subnet
+`sudo tcpdump -i ens33 -n  dst net  192.168.1.1/24` : Destination subnet
+
+Another one is port. Caputring based on a specific port and can add source port or destination port
+`sudo tcpdump -i ens33 -n  port 21`
+`sudo tcpdump -i ens33 -n src port 21`
+`sudo tcpdump -i ens33 -n dst  port 21`
+
+#### Logical Operators
+`sudo tcpdump -i ens33 -n src 192.168.11 and dst port 21`
+
+##### Combining Various Opearators
+![alt text](image-39.png)
+
+Filter Pcket based on protocol
+
+`sudo tcpdump -i ens33 -n arp`
+`sudo tcpdump -i ens33 -n ssh`
+
+#### Saving to a File
+
+`sudo tcpdump -i ens33 -n src 192.168.11 and dst port 21 -w ~/Desktop/capture.pcap`
+This will save the output to Destop to the name capture.pcap
+
+### Analyzing Network Traffic
+Count the number fo packets in a pcap file we use the command 
+`tcpdum -r <name of pcap> --count`
+![count packet](image-40.png)
+
+To determine the number of packets to capture or read from a pcap we use the `-c ` flag as shown
+`tcpdum -r <name of pcap> -c 2` Indicating you are reading only 2 packets
+![alt text](image-41.png)
+
+Adding the `-t` flag removes the timestamp
+![alt text](image-42.png)
+Using double t (tt) will convert the time to standard epoc time
+![epoc time](image-43.png)
+The **-ttt** will print the time in milisecond since the previous packet
+![ttt](image-44.png)
+
+Useing **tttt** will print in the standard date and time format
+![alt text](image-45.png)
+
 ## SKILLS
 
 1. Email Analysis.
