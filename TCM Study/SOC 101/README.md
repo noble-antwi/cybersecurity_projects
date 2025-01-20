@@ -572,7 +572,8 @@ Filter Pcket based on protocol
 This will save the output to Destop to the name capture.pcap
 
 ### Analyzing Network Traffic
-Count the number fo packets in a pcap file we use the command 
+
+Count the number of packets in a pcap file we use the command 
 `tcpdum -r <name of pcap> --count`
 ![count packet](image-40.png)
 
@@ -589,6 +590,11 @@ The **-ttt** will print the time in milisecond since the previous packet
 
 Useing **tttt** will print in the standard date and time format
 ![alt text](image-45.png)
+
+![alt text](image-46.png)
+
+Sort and Cut command Combination
+![alt text](image-47.png)
 
 ## SKILLS
 
