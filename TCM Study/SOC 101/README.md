@@ -596,12 +596,98 @@ Useing **tttt** will print in the standard date and time format
 Sort and Cut command Combination
 ![alt text](image-47.png)
 
+## Intrusion Detection  and Prevention with Snort
+
+
+IDS: will continoulsy moniotr network traffic for abnormal things and can trigger alert that can even conduct. IDS logs all its events. Passive monitoring
+
+IPS: deployed inline and hence can introduce some latency.
+
+1. Network based IDS/IPS
+2. Host based IDS/IPS
+
+### Detection Methods
+1. Signature base detection: 
+   1. comparing activities against known attack patterns
+   2. effective at known threats
+   3. not effective againt what it does not known
+2. Behaviour-Based detections
+   1. identifying anomalies that deviate fromc a pre-establushed baseline
+3. Rule-base detection
+   1. requires a lot of maintenance
+
+### SNort Modes
+
+1. Sniffer mode
+2. Packet Logger mode
+3. IDS/IPS mode
+### snort configuration files
+/etc/snort
+
+Running snort in the sniffer mode `snort -i <name of interface>`
+to see the tcp header we can add the `-e` argument.
+
+TO obtain the paylod output in ASCI and 
+
+### Packet logger mode.
+`snort -i <name of interface>` -l
+
+### Read a Snort Log
+
+snort -r <name of log>
+
+Snort log can also be opened with tcpdump and wireshark as well
+
+
+### Writing Snort Rules
+
+Snort rules are divided into two logical sections
+![alt text](image-48.png)
+
+![snort rule syntax](image-49.png)
+
+Running snort shuld use -A which specifies the alert mode whuch can be Full, fast and none
+`root@tcm:/etc/snort# snort -A console -l /var/log/snort/ -i ens37 -c /etc/snort/snort.conf -q`
+
+### community Rules
+
+### snort as IPS
+
+In the rule, you use drop instead of alert.
+snorpy is the web based portal to create snort rules on the fly.
+
+### intrusion Detection and Prevention with Snort
+ 
+ **Creating Custom Detection Rules**
+
+Opening a wireshark with the terminal `sudo wireshark 1.pcap `
+
+Creationg of the rule can be done usingg the url `https://snorpy.cyb3rs3c.net/`
+![snorpy](image-50.png)
+
+Rule creation
+![Snorpy Rule Creation](image-51.png)
+`alert tcp any any -> any 80 ( msg:"URI Containes .exe file";  content:"|2e|exe"; nocase; http_uri; sid:100003; rev:1; )`
+
+Moving into the local Rules Directory
+
+`sudo nano /etc/snort/rules/local.rules`
+
+![Creating the Rules](image-52.png)
+
+I will then run the snort to read from a pcap in order to determine whether it catches anything using the rule above
+
+`sudo snort -c /etc/snort/rules/snort.conf -q -r 1.pcap -A console`
+![running snort on a pcap](image-53.png)
+
+
 ## SKILLS
 
 1. Email Analysis.
 2. Phishing Analysis
 3. URL Analysis
-4. Intrusion detection
+4. Intrusion detection and Prevention with Snort
 5. Packet Analysis
 6. Detection Rules
 7. Network Monitoring
+8. Snort

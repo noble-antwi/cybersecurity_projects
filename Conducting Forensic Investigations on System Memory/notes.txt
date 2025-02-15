@@ -1,0 +1,32 @@
+Oldest Process is System and its start time is 4:24:49 AM
+The Newest Process is the conhost.exe which was started at 6:42:43 AM
+
+-------------------------------------------------------------------------
+Conhost.exe, short for Console Host Window Process, also referred to as the Console Application Host, is a legitimate software component of Microsoft Windows and Microsoft Server operating systems, developed by Microsoft Corporation. It plays a crucial role in managing console windows for command-line applications such as the Command Prompt (cmd.exe) or PowerShell. Introduced to enhance the user experience, conhost.exe provides improved text rendering, drag-and-drop functionality for files into command-line interfaces, and better integration between the graphical user interface and command-line tools.
+
+As a trusted component, conhost.exe resides in the C:\Windows\System32 directory and ensures the stability and security of console applications by isolating their processes from the main Windows shell. While conhost.exe is typically safe, it can be exploited by malicious actors who may create harmful software disguised with the same name. To verify its legitimacy, users can check the file's location and monitor its behavior using system tools or antivirus software, especially if unusual activity, such as excessive resource usage, is observed.
+-----------------------------------------------------------------------------------------
+Hooker.exe is an executable file associated with software called Hooker, developed by Ayuda Soft. It is not an essential component of the Windows operating system and is generally regarded as unsafe. Depending on its location and behavior, it poses varying security risks.
+
+Typically found in a subfolder of **C:**, hooker.exe is known for its ability to record keyboard and mouse inputs, monitor applications, and connect to the internet. In these cases, it has been assigned a security rating of 100% dangerous due to its potential use for malicious purposes. If located in C:\Program Files, the security risk is lower, rated at 54% dangerous, and the file may feature a visible program window. If found in a subfolder of the user's profile folder, the risk increases to 78% dangerous, and similar keylogging capabilities are present.
+
+Hooker.exe is not a core Windows file and does not have a clear description or legitimate use associated with the operating system. It is often loaded during the Windows boot process, which further raises concerns about its behavior. Moreover, malware such as Generic PUP.z (detected by McAfee) or not-a-virus
+.Win32.Hooker.n (detected by Kaspersky) may disguise itself using the name hooker.exe.
+
+Given these risks, it is essential to verify the legitimacy of hooker.exe on your system. Using tools like Security Task Manager is recommended to determine if it is a threat and to take appropriate action if necessary.
+=========================================================================================
+
+Rvlkl.exe is the executable file for Revealer Keylogger, a software developed by Logixoft. This keylogger is designed to monitor and log user activity, making it popular for parental monitoring and security purposes. It is available in a free Basic version and a paid Complete version, which offers additional features such as multi-PC licensing, remote log delivery, and screenshots of activity.
+
+The default location of the file is C:\Windows\System32\rvlkl.exe, and in its Complete version, the process can be hidden both on disk and in Task Manager for discreet operation. Uninstallation can be done through the program’s "Help" interface or by re-running its setup program. A version of the rvlkl.exe process is also used in Geometrix architectural training AI software, which can be updated or removed via the Control Panel.
+
+Although Revealer Keylogger is legitimate software and widely used in Europe, especially in France, it can raise security concerns due to its ability to record user activity and potentially sensitive data. As with any executable file, rvlkl.exe could be exploited by malicious actors, so it is important to confirm its legitimacy. If unauthorized, the file should be removed using antivirus or monitoring tools.
+
+===========================
+Several types of software and tools use port 4444 as their default listener port:
+1. Metasploit Framework: This is one of the most well-known tools that uses port 4444 by default. Metasploit is a penetration testing framework that allows security professionals to test the security of systems by simulating attacks. The default port for reverse shells and payload handlers in Metasploit is often set to 4444.
+
+2. Netcat: Often referred to as the "Swiss Army knife" of networking, Netcat can be used to open TCP or UDP connections, including listening on port 4444. It's commonly used for debugging and network exploration.
+
+3.  Malware and Backdoors: Unfortunately, port 4444 is also commonly used by various types of malware, including rootkits, backdoors, and Trojan horses. These malicious programs use the port to listen for incoming connections, exfiltrate data, or receive commands from an attacker.
+
