@@ -679,6 +679,94 @@ I will then run the snort to read from a pcap in order to determine whether it c
 
 `sudo snort -c /etc/snort/rules/snort.conf -q -r 1.pcap -A console`
 ![running snort on a pcap](image-53.png)
+In the example above, we were able to detect the downloaded file due to the .exe extension included in the request uri.
+In the case the file extension is not included in the request URI or obscured by other means, we will have to rely on other detection Method
+to captured malicous downloads. One approach in doing this is to inspeec the content type headers in the http response.
+Many excecutable files are transmitted with the content tyep `application/x-msdownload` . Thu string can therefore be used to triger alert.
+
+![Content Type](image-54.png)
+
+Creating Snort Rules to Detect These Scenario
+The created rule is  
+```bash
+alert tcp any 80 -> any any (msg:"Potential .exe file downloaded over http"; content:"Content-Type: application/x-msdownload";http_header; sid:1000003; rev:1;)
+
+```
+![rule image](image-55.png)
+
+
+Running snort with the newly configured Rule
+
+Running the command 
+`sudo snort -c /etc/snort/snort.conf -q -r PCAPs/1.pcap -A console` generated an alert of 
+
+``` bash
+09/14-08:35:32.825541  [**] [1:1000003:1] Potential .exe file downloaded over http [**] [Priority: 0] {TCP} 103.232.55.148:80 -> 10.0.0.168:49724
+```
+![alert genearted](image-56.png)
+
+IT is still possible for attackers to spoof the file extension and the content type header. These are common techniques attackers use to by passwordchecks and 
+these kinds of rules.
+
+You should egt ehr Magic byte of the the windows executatble. The magic byte for windows excutable is`MZ` and its corresponding Hexadecimal pattern is `4D 5A`
+
+File Signatures can be obtained at `https://en.wikipedia.org/wiki/List_of_file_signatures`
+![alt text](image-57.png)
+
+Now creating the new Rule to alert on this kind of information.
+
+``` bash
+
+alert tcp any 80 -> any any (msg: "HTTP Payload contained DOS MZ or PE executable signature"; file_data; content:"|4D 5A|"; depth:2; sid:1000004; rev:1;)
+
+```
+![alt text](image-58.png)
+
+
+
+The result can be sene below
+![alt text](image-59.png)
+
+Opening the log in wireshark
+![alt text](image-60.png)
+In the wireshark attachd screenshot, following the tcp stream will reveal that the file has the `MZ` attached.
+
+
+#### Creating the Snort RUle to catch the SSLoad User Agent
+![alt text](image-61.png)
+
+``` bash
+alert tcp any any -> any any (msg: "Detected SSLOad activity via User-Agent"; content: "User-Agent: SSLoad/1.1"; http_header; nocase; sid:1000005; rev:1;)
+
+```
+The nocase ensure it catches the SSLoad even when it comes in small letters making it case in-senstive.
+![alt text](image-62.png)
+
+
+Now Running SNort Agagin but this time around in the Second PCAP file containes the sslload user-agent.
+The command used to run snort is:
+
+```bash
+sudo snort -c /etc/snort/snort.conf -q -r PCAPs/2.pcap -A console
+```
+![alt text](image-63.png)
+
+It generated 9 alets which corresponds to having a wireshark filer of **http.user_agent containes "SSLoad"**
+
+
+#### Analyzing an SSH Brute Force pcap (3.pcap) || Creating a Snort Rule to Detect the SSH Brute Force Attempt
+
+This time around we will use snorpy to generetat the rule set.
+![Snorpy](image-64.png)
+
+The generated rule is
+``` bash
+alert tcp any any -> any 22 ( msg:"Potential SSH Brute Force Attack Detected"; flow:to_server,established; threshold:type both, track by_src, count 5 , seconds 30; sid:1000007; rev:1; )
+
+```
+
+The rule generated the alert as expected in the image below
+![ssh brute force attempt](image-65.png)
 
 
 ## SKILLS
